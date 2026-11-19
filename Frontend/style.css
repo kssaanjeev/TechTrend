@@ -429,3 +429,82 @@ body {
 [data-bs-theme="light"] .article-card:hover {
     box-shadow: 0 10px 24px rgba(25, 40, 70, 0.08);
 }
+
+/* Trending Technologies Section */
+.trending-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+}
+
+.trending-topic-card {
+    padding: 18px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    background: rgba(8, 15, 27, .48);
+    transition: .2s ease;
+}
+
+.trending-topic-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-blue);
+    background: rgba(30, 53, 83, .45);
+}
+
+.trending-rank {
+    display: inline-block;
+    color: var(--accent-blue);
+    font-size: .72rem;
+    font-weight: 800;
+    margin-bottom: 13px;
+}
+
+.trending-topic-name {
+    color: var(--text-primary);
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.trending-topic-count {
+    color: var(--text-muted);
+    font-size: .8rem;
+    margin-bottom: 16px;
+}
+
+.trending-topic-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: .72rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 11px;
+}
+
+.trending-growth {
+    color: var(--accent-green);
+    font-weight: 800;
+}
+
+[data-bs-theme="light"] .trending-topic-card {
+    background: #f8faff;
+}
+
+/* Fix KPI text overflow */
+.kpi-card .card-body {
+    min-width: 0;
+}
+
+.kpi-card h3,
+.kpi-card h5 {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.3;
+    max-width: 100%;
+}
+
+#kpiTopCategory {
+    font-size: clamp(1rem, 1.5vw, 1.5rem);
+}
