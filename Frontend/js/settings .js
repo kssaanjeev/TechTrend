@@ -1,6 +1,5 @@
 /**
- * Emerging Technology Trend Identifier - Settings & Backend API Config Logic
- * Saves API endpoint settings, timeout, source toggle, and default dashboard filters.
+ * Emerging Technology Trend Identifier - Appearance & Reading Preferences
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10,108 +9,75 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function populateSettingsForm() {
-    const settings = getSettings();
+    const s = getSettings();
 
-    const urlInput = document.getElementById("apiBaseUrl");
-    const timeoutInput = document.getElementById("apiTimeoutMs");
-    const liveToggle = document.getElementById("useLiveApi");
-    const catSelect = document.getElementById("defaultCategory");
-    const timeSelect = document.getElementById("defaultTimePeriod");
-    const srcSelect = document.getElementById("defaultSourceType");
+    const themeRadio = document.querySelector(`input[name="uiTheme"][value="${s.uiTheme || "dark"}"]`);
+    if (themeRadio) themeRadio.checked = true;
 
-    if (urlInput) urlInput.value = settings.apiBaseUrl || DEFAULT_SETTINGS.apiBaseUrl;
-    if (timeoutInput) timeoutInput.value = settings.apiTimeoutMs || DEFAULT_SETTINGS.apiTimeoutMs;
-    if (liveToggle) liveToggle.checked = Boolean(settings.useLiveApi);
+    const densityEl = document.getElementById("cardDensity");
+    if (densityEl) densityEl.value = s.cardDensity || "comfortable";
 
-    if (catSelect && settings.defaultCategory) {
-        const hasCat = Array.from(catSelect.options).some(opt => opt.value === settings.defaultCategory);
-        if (hasCat) catSelect.value = settings.defaultCategory;
-    }
+    const summaryEl = document.getElementById("showSummariesByDefault");
+    if (summaryEl) summaryEl.checked = s.showSummariesByDefault !== false;
 
-    if (timeSelect && settings.defaultTimePeriod) {
-        const hasTime = Array.from(timeSelect.options).some(opt => opt.value === settings.defaultTimePeriod);
-        if (hasTime) timeSelect.value = settings.defaultTimePeriod;
-    }
+    const animEl = document.getElementById("enableChartAnimations");
+    if (animEl) animEl.checked = s.enableChartAnimations !== false;
 
-    if (srcSelect && settings.defaultSourceType) {
-        const hasSrc = Array.from(srcSelect.options).some(opt => opt.value === settings.defaultSourceType);
-        if (hasSrc) srcSelect.value = settings.defaultSourceType;
-    }
+    const catEl = document.getElementById("defaultCategory");
+    if (catEl) catEl.value = s.defaultCategory || "All";
 
-    updateApiModeBadge(Boolean(settings.useLiveApi), settings.apiBaseUrl);
-}
+    const timeEl = document.getElementById("defaultTimePeriod");
+    if (timeEl) timeEl.value = s.defaultTimePeriod || "all";
 
-function updateApiModeBadge(useLiveApi, apiBaseUrl) {
-    const badge = document.getElementById("apiModeBadge");
-    if (!badge) return;
-
-    if (useLiveApi) {
-        badge.innerHTML = `<i class="bi bi-broadcast text-success me-1"></i> Mode: Live Backend (${escapeSettingsHtml(apiBaseUrl || "")})`;
-    } else {
-        badge.innerHTML = `<i class="bi bi-hdd-stack text-info me-1"></i> Mode: Curated Offline Data`;
-    }
+    const citeEl = document.getElementById("defaultCitationStyle");
+    if (citeEl) citeEl.value = s.defaultCitationStyle || "APA";
 }
 
 function bindSettingsEvents() {
-    const form = document.getElementById("settingsForm");
-    const resetBtn = document.getElementById("resetDefaultsBtn");
-    const testBtn = document.getElementById("testBackendBtn");
-    const liveToggle = document.getElementById("useLiveApi");
-    const urlInput = document.getElementById("apiBaseUrl");
-
-    liveToggle?.addEventListener("change", () => {
-        updateApiModeBadge(liveToggle.checked, urlInput?.value.trim());
+    // Live preview when switching Dark / Light theme
+    document.querySelectorAll('input[name="uiTheme"]').forEach(radio => {
+        radio.addEventListener("change", () => {
+            if (typeof applyUserTheme === "function") {
+                applyUserTheme(radio.value);
+            }
+        });
     });
 
-    urlInput?.addEventListener("input", () => {
-        updateApiModeBadge(Boolean(liveToggle?.checked), urlInput.value.trim());
-    });
-
-    form?.addEventListener("submit", (e) => {
+    document.getElementById("settingsForm")?.addEventListener("submit", (e) => {
         e.preventDefault();
-
-        const rawUrl = (urlInput?.value || "").trim() || DEFAULT_SETTINGS.apiBaseUrl;
-        const rawTimeout = parseInt(document.getElementById("apiTimeoutMs")?.value || "5000", 10);
-        const validTimeout = Number.isFinite(rawTimeout) && rawTimeout >= 1000 ? rawTimeout : DEFAULT_SETTINGS.apiTimeoutMs;
+        const current = getSettings();
+        const selectedTheme = document.querySelector('input[name="uiTheme"]:checked')?.value || "dark";
 
         const updated = saveSettings({
-            apiBaseUrl: rawUrl.replace(/\/+$/, ""),
-            apiTimeoutMs: validTimeout,
-            useLiveApi: Boolean(liveToggle?.checked),
+            ...current,
+            uiTheme: selectedTheme,
+            cardDensity: document.getElementById("cardDensity")?.value || "comfortable",
+            showSummariesByDefault: Boolean(document.getElementById("showSummariesByDefault")?.checked),
+            enableChartAnimations: Boolean(document.getElementById("enableChartAnimations")?.checked),
             defaultCategory: document.getElementById("defaultCategory")?.value || "All",
             defaultTimePeriod: document.getElementById("defaultTimePeriod")?.value || "all",
-            defaultSourceType: document.getElementById("defaultSourceType")?.value || "All"
+            defaultCitationStyle: document.getElementById("defaultCitationStyle")?.value || "APA"
+        });
+
+        if (typeof applyUserTheme === "function") {
+            applyUserTheme(updated.uiTheme);
+        }
+        triggerToast("Preferences saved.");
+    });
+
+    document.getElementById("resetDefaultsBtn")?.addEventListener("click", () => {
+        const current = getSettings();
+        const defaults = saveSettings({
+            ...DEFAULT_SETTINGS,
+            apiBaseUrl: current.apiBaseUrl,
+            apiTimeoutMs: current.apiTimeoutMs,
+            useLiveApi: current.useLiveApi
         });
 
         populateSettingsForm();
-        triggerToast(`Settings saved (${updated.useLiveApi ? "Live Python API" : "Curated Data"}).`);
-    });
-
-    resetBtn?.addEventListener("click", () => {
-        const defaults = resetSettingsToDefault();
-        populateSettingsForm();
-        updateApiModeBadge(defaults.useLiveApi, defaults.apiBaseUrl);
-        triggerToast("Settings restored to defaults.");
-    });
-
-    testBtn?.addEventListener("click", async () => {
-        const candidateUrl = (urlInput?.value || "").trim() || DEFAULT_SETTINGS.apiBaseUrl;
-        triggerToast(`Testing connection to ${candidateUrl}/dashboard...`);
-
-        const result = await pingBackendApi(candidateUrl);
-        if (result.ok) {
-            triggerToast(`Backend reachable (${result.status} OK) at ${result.url}`);
-        } else {
-            const reason = result.status ? `HTTP ${result.status}` : (result.error || "Unreachable");
-            triggerToast(`Backend check failed (${reason}). Dashboard will use curated fallback if live mode is on.`, true);
+        if (typeof applyUserTheme === "function") {
+            applyUserTheme(defaults.uiTheme);
         }
+        triggerToast("Preferences reset to defaults.");
     });
-}
-
-function escapeSettingsHtml(str) {
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
 }
