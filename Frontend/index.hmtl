@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerging Technology Trend Identifier | Academic Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg border-bottom sticky-top top-navbar px-3 px-lg-4">
+        <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <!-- Brand & Academic Badge -->
+            <div class="d-flex align-items-center gap-3">
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0" href="#">
+                    <span class="brand-icon"><i class="bi bi-cpu-fill"></i></span>
+                    <span>Emerging Technology Trend Identifier</span>
+                </a>
+                <span class="badge academic-badge d-none d-md-inline-flex align-items-center gap-1">
+                    <i class="bi bi-mortarboard-fill"></i> Students &amp; Faculty • Open Source
+                </span>
+            </div>
+
+            <!-- Global Live Search Bar -->
+            <div class="search-wrapper flex-grow-1 flex-md-grow-0">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-dark border-secondary-subtle text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        id="globalSearchInput"
+                        class="form-control bg-dark border-secondary-subtle"
+                        placeholder="Search titles, summaries, or keywords..."
+                        aria-label="Search articles"
+                    >
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN SHELL -->
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- LEFT NAVIGATION & FILTER SIDEBAR -->
+            <aside class="col-lg-3 col-xl-2 border-end p-3 p-lg-4 sidebar-panel">
+                <!-- App Navigation Links -->
+                <div class="mb-4">
+                    <div class="sidebar-section-title">Workspace</div>
+                    <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center gap-2" href="#dashboard" data-view="dashboard">
+                                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2" href="#feeds" data-view="feeds">
+                                <i class="bi bi-rss-fill"></i> Data Sources / Feeds
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center justify-content-between" href="#saved" data-view="saved">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-bookmark-star-fill"></i> Saved Reading List
+                                </span>
+                                <span class="badge rounded-pill bg-primary-subtle text-primary" id="navSavedBadge">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2" href="#settings" data-view="settings">
+                                <i class="bi bi-gear-fill"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr class="border-secondary-subtle">
+
+                <!-- Trend Filters -->
+                <div class="sidebar-section-title">Trend Filters</div>
+
+                <!-- Topic Category Filter -->
+                <div class="mb-3">
+                    <label for="categoryFilter" class="form-label small fw-semibold text-light-emphasis">
+                        <i class="bi bi-folder2-open me-1 text-primary"></i> Topic Category
+                    </label>
+                    <select id="categoryFilter" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                        <option value="All">All Topics</option>
+                        <option value="AI & Machine Learning">AI &amp; Machine Learning</option>
+                        <option value="Quantum Computing">Quantum Computing</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="Edge & Hardware Systems">Edge &amp; Hardware Systems</option>
+                    </select>
+                </div>
+
+                <!-- Time Period Filter -->
+                <div class="mb-3">
+                    <label for="timeFilter" class="form-label small fw-semibold text-light-emphasis">
+                        <i class="bi bi-calendar-range me-1 text-info"></i> Time Period
+                    </label>
+                    <select id="timeFilter" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                        <option value="all" selected>All Time</option>
+                        <option value="90">Last 3 Months</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="7">Last 7 Days</option>
+                    </select>
+                </div>
+
+                <!-- Compare Keywords Checkboxes -->
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold text-light-emphasis">
+                        <i class="bi bi-graph-up me-1 text-success"></i> Compare Keywords
+                    </label>
+                    <div id="keywordCheckboxes" class="d-flex flex-column gap-2 ps-1">
+                        <div class="form-check">
+                            <input class="form-check-input kw-toggle" type="checkbox" value="Agentic AI" id="kwAgentic" checked>
+                            <label class="form-check-label small" for="kwAgentic">
+                                <span class="legend-dot" style="background:#58a6ff;"></span>Agentic AI
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input kw-toggle" type="checkbox" value="Quantum Error Correction" id="kwQuantum" checked>
+                            <label class="form-check-label small" for="kwQuantum">
+                                <span class="legend-dot" style="background:#a371f7;"></span>Quantum Error Correction
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input kw-toggle" type="checkbox" value="Neuromorphic Edge" id="kwEdge" checked>
+                            <label class="form-check-label small" for="kwEdge">
+                                <span class="legend-dot" style="background:#3fb950;"></span>Neuromorphic Edge
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input kw-toggle" type="checkbox" value="Post-Quantum Crypto" id="kwCrypto">
+                            <label class="form-check-label small" for="kwCrypto">
+                                <span class="legend-dot" style="background:#f78166;"></span>Post-Quantum Crypto
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset Filters Button -->
+                <button id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+                </button>
+            </aside>
+
+            <!-- MAIN DASHBOARD CONTENT -->
+            <main class="col-lg-9 col-xl-10 p-3 p-lg-4">
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                    <div>
+                        <h2 class="fw-bold mb-1 fs-4" id="dashboardTitle">Main Trend Dashboard</h2>
+                        <p class="text-secondary small mb-0">
+                            Tracking recurring technology topics across peer-reviewed preprints and engineering news feeds.
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-dark border border-secondary-subtle text-secondary py-2 px-3">
+                            <i class="bi bi-database-check text-success me-1"></i> Dataset: Curated Academic &amp; Tech Feed
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 2. TOP KPI SUMMARY ROW (4 CARDS) -->
+                <div class="row g-3 mb-4">
+                    <!-- KPI 1: Articles Analyzed -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card kpi-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="kpi-label">Articles Analyzed</span>
+                                    <span class="kpi-icon bg-primary-subtle text-primary">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h3 class="fw-bold mb-0" id="kpiArticlesCount">0</h3>
+                                    <span class="small text-secondary" id="kpiSourceSplit">0 Papers • 0 News</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Top Emerging Keyword -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card kpi-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="kpi-label">Top Emerging Keyword</span>
+                                    <span class="kpi-icon bg-success-subtle text-success">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-baseline justify-content-between gap-2">
+                                    <h5 class="fw-bold mb-0 text-truncate" id="kpiTopKeyword">—</h5>
+                                    <span class="badge bg-success-subtle text-success" id="kpiKeywordGrowth">+0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Most Active Category -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card kpi-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="kpi-label">Most Active Category</span>
+                                    <span class="kpi-icon bg-info-subtle text-info">
+                                        <i class="bi bi-layers"></i>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-baseline justify-content-between gap-2">
+                                    <h5 class="fw-bold mb-0 text-truncate" id="kpiTopCategory">—</h5>
+                                    <span class="small text-secondary" id="kpiCategoryShare">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Saved Reading Items -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card kpi-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="kpi-label">Saved Reading Items</span>
+                                    <span class="kpi-icon bg-warning-subtle text-warning">
+                                        <i class="bi bi-bookmark-check"></i>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-baseline justify-content-between">
+                                    <h3 class="fw-bold mb-0" id="kpiSavedCount">0</h3>
+                                    <button id="toggleSavedOnlyBtn" class="btn btn-link btn-sm p-0 text-decoration-none">
+                                        View Saved
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TREND & KEYWORD FREQUENCY CHARTS -->
+                <div class="row g-4 mb-4">
+                    <!-- Multi-Line Trend Comparison Chart -->
+                    <div class="col-lg-7">
+                        <div class="card dashboard-card h-100">
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
+                                <span class="fw-semibold">
+                                    <i class="bi bi-activity text-primary me-2"></i>Multi-Line Keyword Trend Comparison
+                                </span>
+                                <span class="text-secondary small">Monthly Mentions</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="trendLineChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keyword Frequency Bar Chart -->
+                    <div class="col-lg-5">
+                        <div class="card dashboard-card h-100">
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3">
+                                <span class="fw-semibold">
+                                    <i class="bi bi-bar-chart-steps text-info me-2"></i>Keyword Frequency (Filtered View)
+                                </span>
+                                <span class="text-secondary small">Occurrences</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="keywordBarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. CATEGORIZED ARTICLES, SUMMARIES & ACADEMIC ACTIONS -->
+                <div class="card dashboard-card">
+                    <div class="card-header bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-journal-richtext text-warning"></i>
+                            <span class="fw-semibold" id="feedSectionHeading">Categorized Research &amp; Tech News Feed</span>
+                            <span class="badge bg-secondary-subtle text-light" id="feedCountBadge">0</span>
+                        </div>
+
+                        <!-- Quick Source Type Pill Filter -->
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Source type filter">
+                            <input type="radio" class="btn-check" name="sourceTypeFilter" id="srcAll" value="All" checked>
+                            <label class="btn btn-outline-secondary" for="srcAll">All Sources</label>
+
+                            <input type="radio" class="btn-check" name="sourceTypeFilter" id="srcPaper" value="Research Paper">
+                            <label class="btn btn-outline-secondary" for="srcPaper">Research Papers</label>
+
+                            <input type="radio" class="btn-check" name="sourceTypeFilter" id="srcNews" value="Tech News">
+                            <label class="btn btn-outline-secondary" for="srcNews">Tech News</label>
+                        </div>
+                    </div>
+
+                    <div class="card-body" id="articlesFeedContainer">
+                        <!-- Rendered dynamically via app.js -->
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification for Copy Citation / Bookmark Feedback -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="actionToast" class="toast align-items-center text-bg-dark border-primary" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Action completed.</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
