@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings &amp; Backend API Config | Emerging Technology Trend Identifier</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Settings | Emerging Technology Trend Identifier</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,7 +13,6 @@
     <!-- TOP NAVIGATION BAR -->
     <nav class="navbar navbar-expand-lg border-bottom sticky-top top-navbar px-3 px-lg-4">
         <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <!-- Brand & Academic Badge -->
             <div class="d-flex align-items-center gap-3">
                 <a class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0" href="index.html">
                     <span class="brand-icon"><i class="bi bi-cpu-fill"></i></span>
@@ -24,13 +20,6 @@
                 </a>
                 <span class="badge academic-badge d-none d-md-inline-flex align-items-center gap-1">
                     <i class="bi bi-mortarboard-fill"></i> Students &amp; Faculty • Open Source
-                </span>
-            </div>
-
-            <!-- Connection Mode Indicator -->
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-dark border border-secondary-subtle text-secondary py-2 px-3" id="apiModeBadge">
-                    <i class="bi bi-hdd-stack text-info me-1"></i> Mode: Curated Offline Data
                 </span>
             </div>
         </div>
@@ -73,91 +62,83 @@
 
                 <hr class="border-secondary-subtle">
 
-                <!-- Quick Config Info -->
-                <div class="sidebar-section-title">Integration Notes</div>
-                <p class="text-secondary small mb-3">
-                    Point the API Base URL to your Python FastAPI or Flask backend (for example, <code>http://127.0.0.1:8000/api</code>) once your teammates' endpoints are running[cite: 9].
+                <div class="sidebar-section-title">About</div>
+                <p class="text-secondary small mb-0">
+                    Personalize your theme, layout density, and default research browsing filters.
                 </p>
-
-                <button type="button" id="testBackendBtn" class="btn btn-outline-info btn-sm w-100">
-                    <i class="bi bi-plug me-1"></i> Test Backend Connection
-                </button>
             </aside>
 
             <!-- MAIN CONTENT -->
             <main class="col-lg-9 col-xl-10 p-3 p-lg-4">
 
-                <!-- Page Header -->
                 <div class="mb-4">
-                    <h2 class="fw-bold mb-1 fs-4">Settings &amp; Backend API Config</h2>
+                    <h2 class="fw-bold mb-1 fs-4">Appearance &amp; Reading Preferences</h2>
                     <p class="text-secondary small mb-0">
-                        Configure your Python backend connection, default dashboard filters, and local storage preferences[cite: 9].
+                        Customize how the dashboard looks and behaves while exploring technology trends.
                     </p>
                 </div>
 
                 <form id="settingsForm" class="row g-4">
 
-                    <!-- 1. Backend & API Integration -->
+                    <!-- 1. UI Theme & Display Settings -->
                     <div class="col-lg-6">
                         <div class="card dashboard-card h-100">
                             <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
-                                <i class="bi bi-hdd-network text-primary"></i>
-                                <span class="fw-semibold">Python Backend API Configuration</span>
+                                <i class="bi bi-palette-fill text-primary"></i>
+                                <span class="fw-semibold">Theme &amp; Display</span>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="apiBaseUrl" class="form-label small fw-semibold">
-                                        Backend API Base URL
-                                    </label>
-                                    <input
-                                        type="url"
-                                        id="apiBaseUrl"
-                                        class="form-control form-control-sm bg-dark border-secondary-subtle"
-                                        placeholder="http://127.0.0.1:8000/api"
-                                    >
-                                    <div class="form-text text-secondary small">
-                                        Expected endpoint: <code>&lt;Base URL&gt;/dashboard</code> returning <code>articles</code> and <code>trendSeries</code>[cite: 9].
+                                    <label class="form-label small fw-semibold d-block">Color Theme</label>
+                                    <div class="btn-group btn-group-sm w-100" role="group" aria-label="Color theme">
+                                        <input type="radio" class="btn-check" name="uiTheme" id="themeDark" value="dark" checked>
+                                        <label class="btn btn-outline-secondary" for="themeDark">
+                                            <i class="bi bi-moon-stars-fill me-1"></i> Dark Academic
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="uiTheme" id="themeLight" value="light">
+                                        <label class="btn btn-outline-secondary" for="themeLight">
+                                            <i class="bi bi-sun-fill me-1"></i> Light Clean
+                                        </label>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="apiTimeoutMs" class="form-label small fw-semibold">
-                                        Request Timeout (ms)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        id="apiTimeoutMs"
-                                        class="form-control form-control-sm bg-dark border-secondary-subtle"
-                                        min="1000"
-                                        max="30000"
-                                        step="500"
-                                        value="5000"
-                                    >
+                                    <label for="cardDensity" class="form-label small fw-semibold">Card Layout Density</label>
+                                    <select id="cardDensity" class="form-select form-select-sm">
+                                        <option value="comfortable">Comfortable (Spacious)</option>
+                                        <option value="compact">Compact (More items per view)</option>
+                                    </select>
                                 </div>
 
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="useLiveApi">
-                                    <label class="form-check-label small" for="useLiveApi">
-                                        Enable Live Python Backend API (fallback to curated JSON if unreachable)[cite: 9]
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="showSummariesByDefault" checked>
+                                    <label class="form-check-label small" for="showSummariesByDefault">
+                                        Show article summaries in feed cards
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="enableChartAnimations" checked>
+                                    <label class="form-check-label small" for="enableChartAnimations">
+                                        Enable smooth chart animations
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 2. Default Dashboard Preferences -->
+                    <!-- 2. Default Browsing & Citation Preferences -->
                     <div class="col-lg-6">
                         <div class="card dashboard-card h-100">
                             <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
                                 <i class="bi bi-sliders text-info"></i>
-                                <span class="fw-semibold">Default Dashboard Preferences</span>
+                                <span class="fw-semibold">Default Browsing &amp; Citations</span>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="defaultCategory" class="form-label small fw-semibold">
-                                        Default Topic Category
-                                    </label>
-                                    <select id="defaultCategory" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                                    <label for="defaultCategory" class="form-label small fw-semibold">Default Topic Category</label>
+                                    <select id="defaultCategory" class="form-select form-select-sm">
                                         <option value="All">All Topics</option>
                                         <option value="AI & Machine Learning">AI &amp; Machine Learning</option>
                                         <option value="Quantum Computing">Quantum Computing</option>
@@ -167,10 +148,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="defaultTimePeriod" class="form-label small fw-semibold">
-                                        Default Time Period
-                                    </label>
-                                    <select id="defaultTimePeriod" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                                    <label for="defaultTimePeriod" class="form-label small fw-semibold">Default Time Window</label>
+                                    <select id="defaultTimePeriod" class="form-select form-select-sm">
                                         <option value="all">All Time</option>
                                         <option value="90">Last 3 Months</option>
                                         <option value="30">Last 30 Days</option>
@@ -179,13 +158,11 @@
                                 </div>
 
                                 <div class="mb-0">
-                                    <label for="defaultSourceType" class="form-label small fw-semibold">
-                                        Default Source Type
-                                    </label>
-                                    <select id="defaultSourceType" class="form-select form-select-sm bg-dark border-secondary-subtle">
-                                        <option value="All">All Sources</option>
-                                        <option value="Research Paper">Research Papers</option>
-                                        <option value="Tech News">Tech News</option>
+                                    <label for="defaultCitationStyle" class="form-label small fw-semibold">Preferred Citation Style</label>
+                                    <select id="defaultCitationStyle" class="form-select form-select-sm">
+                                        <option value="APA">APA Style</option>
+                                        <option value="IEEE">IEEE Style</option>
+                                        <option value="BibTeX">BibTeX Entry</option>
                                     </select>
                                 </div>
                             </div>
@@ -195,7 +172,7 @@
                     <!-- Action Buttons -->
                     <div class="col-12 d-flex flex-wrap gap-2">
                         <button type="submit" class="btn btn-primary btn-sm px-4">
-                            <i class="bi bi-check2-circle me-1"></i> Save Settings
+                            <i class="bi bi-check2-circle me-1"></i> Save Preferences
                         </button>
                         <button type="button" id="resetDefaultsBtn" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
@@ -213,16 +190,14 @@
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
                     <i class="bi bi-check-circle-fill text-success"></i>
-                    <span>Action completed.</span>
+                    <span>Preferences saved.</span>
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Shared State & Settings Logic -->
     <script src="js/shared.js"></script>
     <script src="js/settings.js"></script>
 </body>
