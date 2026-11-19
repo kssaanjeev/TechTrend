@@ -1,7 +1,3 @@
-/**
- * Emerging Technology Trend Identifier - Appearance & Reading Preferences
- */
-
 document.addEventListener("DOMContentLoaded", () => {
     updateNavSavedBadge();
     populateSettingsForm();
@@ -10,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function populateSettingsForm() {
     const s = getSettings();
-
     const themeRadio = document.querySelector(`input[name="uiTheme"][value="${s.uiTheme || "dark"}"]`);
     if (themeRadio) themeRadio.checked = true;
 
@@ -34,7 +29,6 @@ function populateSettingsForm() {
 }
 
 function bindSettingsEvents() {
-    // Live preview when switching Dark / Light theme
     document.querySelectorAll('input[name="uiTheme"]').forEach(radio => {
         radio.addEventListener("change", () => {
             if (typeof applyUserTheme === "function") {
