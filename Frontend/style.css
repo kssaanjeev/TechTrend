@@ -220,7 +220,7 @@ body {
 }
 
 [data-bs-theme="light"] .top-navbar {
-    background-color: rgba(255, 255, 255, 0.94);
+    background-color: rgba(255, 255, 255, 0.95);
 }
 
 [data-bs-theme="light"] .sidebar-panel,
@@ -250,4 +250,182 @@ body {
 body.density-compact .article-card {
     padding: 0.85rem 1rem;
     margin-bottom: 0.65rem;
+}
+
+
+/* =========================================
+   DASHBOARD UI UPGRADE - STEP 1
+========================================= */
+
+:root {
+    --accent-blue: #6c9eff;
+    --accent-purple: #a78bfa;
+    --accent-green: #34d399;
+    --card-radius: 16px;
+}
+
+/* Overall dashboard */
+body {
+    background:
+        radial-gradient(ellipse at top right, rgba(88, 166, 255, 0.07), transparent 35%),
+        var(--bg-canvas);
+    line-height: 1.55;
+}
+
+/* Top navigation */
+.top-navbar {
+    min-height: 68px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    font-size: 1.1rem;
+}
+
+.navbar-brand {
+    font-size: 1rem;
+    letter-spacing: -0.3px;
+}
+
+/* Sidebar */
+.sidebar-panel {
+    padding-top: 1.5rem !important;
+}
+
+@media (min-width: 992px) {
+    .sidebar-panel {
+        position: sticky;
+        top: 68px;
+        height: calc(100vh - 68px);
+        overflow-y: auto;
+    }
+}
+
+.sidebar-panel .nav-link {
+    padding: 0.7rem 0.85rem;
+    border-radius: 10px;
+    margin-bottom: 3px;
+}
+
+.sidebar-panel .nav-link.active {
+    box-shadow: inset 3px 0 0 var(--accent-blue);
+}
+
+/* KPI cards */
+.kpi-card {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.2s ease, border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(108, 158, 255, 0.55);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+}
+
+.kpi-card .card-body {
+    padding: 1.25rem;
+}
+
+.kpi-card h3,
+.kpi-card h5 {
+    letter-spacing: -0.5px;
+}
+
+/* Dashboard chart cards */
+.dashboard-card {
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+}
+
+.dashboard-card .card-header {
+    min-height: 58px;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+}
+
+.dashboard-card .card-body {
+    padding: 1.25rem;
+}
+
+.chart-container {
+    height: 290px;
+}
+
+/* Article cards */
+.article-card {
+    border-radius: 14px;
+    padding: 1.35rem;
+    transition: transform 0.2s ease, border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.article-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.article-card h5 {
+    line-height: 1.45;
+    letter-spacing: -0.25px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 9px;
+    transition: all 0.18s ease;
+}
+
+.form-control,
+.form-select {
+    border-radius: 9px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(108, 158, 255, 0.13);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .navbar-brand {
+        font-size: 0.88rem;
+    }
+
+    main {
+        padding: 1rem !important;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .dashboard-card .card-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .article-card {
+        padding: 1rem;
+    }
+}
+
+/* Light theme adjustments */
+[data-bs-theme="light"] .kpi-card,
+[data-bs-theme="light"] .dashboard-card {
+    box-shadow: 0 4px 18px rgba(25, 40, 70, 0.04);
+}
+
+[data-bs-theme="light"] .article-card:hover {
+    box-shadow: 0 10px 24px rgba(25, 40, 70, 0.08);
 }
