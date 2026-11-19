@@ -204,3 +204,50 @@ body {
         min-width: 100%;
     }
 }
+
+[data-bs-theme="light"] {
+    --bg-canvas: #f5f7fb;
+    --bg-surface: #ffffff;
+    --bg-elevated: #eef2f8;
+    --border-subtle: #dce2ec;
+    --text-primary: #161b26;
+    --text-muted: #5a6578;
+}
+
+[data-bs-theme="light"] body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="light"] .top-navbar {
+    background-color: rgba(255, 255, 255, 0.94);
+}
+
+[data-bs-theme="light"] .sidebar-panel,
+[data-bs-theme="light"] .kpi-card,
+[data-bs-theme="light"] .dashboard-card {
+    background-color: var(--bg-surface);
+}
+
+[data-bs-theme="light"] .article-card {
+    background-color: #f9fbff;
+}
+
+[data-bs-theme="light"] .form-control,
+[data-bs-theme="light"] .form-select,
+[data-bs-theme="light"] .input-group-text,
+[data-bs-theme="light"] .bg-dark {
+    background-color: #ffffff !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-subtle) !important;
+}
+
+[data-bs-theme="light"] .text-light-emphasis {
+    color: var(--text-primary) !important;
+}
+
+/* Compact Card Density */
+body.density-compact .article-card {
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.65rem;
+}
