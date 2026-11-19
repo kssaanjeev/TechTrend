@@ -148,7 +148,72 @@ function refreshDashboard() {
     const filtered = getFilteredArticles();
     updateDashboardKPIs(filtered);
     renderBarChart(filtered);
+    renderTrendingTopics(filtered);
     renderArticleFeed(filtered);
+}
+
+// --- TRENDING TECHNOLOGIES ---
+function renderTrendingTopics(articles) {
+    const container = document.getElementById("trendingTopicsContainer");
+    if (!container) return;
+
+    const counts = {};
+
+    articles.forEach(article => {
+        (article.keywords || []).forEach(keyword => {
+            counts[keyword] = (counts[keyword] || 0) + 1;
+        });
+    });
+
+    const topics = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    container.replaceChildren();
+
+    if (topics.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-secondary small mb-0";
+        empty.textContent = "No trending topics found for these filters.";
+        container.appendChild(empty);
+        return;
+    }
+
+    topics.forEach(([keyword, count], index) => {
+        const trend = dashboardState.trendSeries?.keywords?.[keyword];
+        const card = document.createElement("div");
+        card.className = "trending-topic-card";
+
+        const rank = document.createElement("span");
+        rank.className = "trending-rank";
+        rank.textContent = `0${index + 1}`;
+
+        const name = document.createElement("h6");
+        name.className = "trending-topic-name";
+        name.textContent = keyword;
+
+        const mentions = document.createElement("p");
+        mentions.className = "trending-topic-count";
+        mentions.textContent =
+            `${count} ${count === 1 ? "article" : "articles"}`;
+
+        const footer = document.createElement("div");
+        footer.className = "trending-topic-footer";
+
+        const label = document.createElement("span");
+        label.textContent = "Topic activity";
+        footer.appendChild(label);
+
+        if (trend?.growth) {
+            const growth = document.createElement("span");
+            growth.className = "trending-growth";
+            growth.textContent = trend.growth;
+            footer.appendChild(growth);
+        }
+
+        card.append(rank, name, mentions, footer);
+        container.appendChild(card);
+    });
 }
 
 // --- UPDATE 4 KPI SUMMARY CARDS ---
