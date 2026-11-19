@@ -17,6 +17,11 @@ const DEFAULT_SETTINGS = {
     defaultTimePeriod: "all",
     defaultSourceType: "All",
     itemsPerPage: 10
+    uiTheme: "dark",
+    cardDensity: "comfortable",
+    enableChartAnimations: true,
+    defaultCitationStyle: "APA",
+    showSummariesByDefault: true,
 };
 
 const DEFAULT_FEEDS = [
