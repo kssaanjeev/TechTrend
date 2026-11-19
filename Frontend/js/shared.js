@@ -359,3 +359,15 @@ function triggerToast(message, isError = false) {
 }
 
 document.addEventListener("DOMContentLoaded", updateNavSavedBadge);
+
+function applyUserTheme(themeOverride = null) {
+    const settings = getSettings();
+    const theme = themeOverride || settings.uiTheme || "dark";
+    document.documentElement.setAttribute("data-bs-theme", theme);
+    document.body.classList.toggle("density-compact", settings.cardDensity === "compact");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    applyUserTheme();
+    updateNavSavedBadge();
+});
