@@ -1,323 +1,245 @@
 /**
  * Emerging Technology Trend Identifier - Home Page Dashboard Logic
- * Designed so `fetchDashboardData()` can easily swap mock JSON for a Python FastAPI/Flask endpoint.
+ * Works with js/shared.js and index.html across multi-page navigation[cite: 8, 9].
  */
 
 const REFERENCE_DATE = new Date("2026-11-19T00:00:00");
-const STORAGE_KEY = "etti_saved_article_ids";
 
-// --- MOCK DATA (Backend JSON Contract) ---
-const MOCK_PAYLOAD = {
-    articles: [
-        {
-            id: "art-101",
-            title: "Hierarchical Multi-Agent Planning for Automated Scientific Literature Synthesis",
-            authors: "R. Subramanian, K. Chen, M. Alvarez",
-            venue: "arXiv Preprint (cs.AI)",
-            sourceType: "Research Paper",
-            category: "AI & Machine Learning",
-            date: "2026-11-16",
-            keywords: ["Agentic AI", "LLM", "Automated Research"],
-            summary: "Introduces a self-verifying multi-agent architecture capable of decomposing complex domain queries, retrieving peer-reviewed citations, and reducing hallucination rates by 41%.",
-            url: "https://arxiv.org/"
-        },
-        {
-            id: "art-102",
-            title: "Surface-Code Logical Qubit Benchmarks Cross Sub-Threshold Error Rates",
-            authors: "D. Lindqvist et al.",
-            venue: "Nature Quantum Information",
-            sourceType: "Research Paper",
-            category: "Quantum Computing",
-            date: "2026-11-14",
-            keywords: ["Quantum Error Correction", "Logical Qubits", "Fault Tolerance"],
-            summary: "Demonstrates sustained error suppression across scaled superconducting qubit arrays, establishing a reproducible baseline for fault-tolerant quantum algorithms.",
-            url: "https://nature.com/"
-        },
-        {
-            id: "art-103",
-            title: "Global Cloud Providers Mandate Hybrid Post-Quantum TLS Handshakes",
-            authors: "S. Narayanan",
-            venue: "IEEE Spectrum News",
-            sourceType: "Tech News",
-            category: "Cybersecurity",
-            date: "2026-11-08",
-            keywords: ["Post-Quantum Crypto", "Zero Trust", "TLS 1.3"],
-            summary: "Major cloud and enterprise infrastructure operators have completed rollouts of ML-KEM lattice cryptography to mitigate harvest-now, decrypt-later threats.",
-            url: "https://spectrum.ieee.org/"
-        },
-        {
-            id: "art-104",
-            title: "Sub-Watt Neuromorphic Vision Co-Processors for Autonomous Micro-Drones",
-            authors: "A. Verma, T. Takahashi",
-            venue: "IEEE Micro",
-            sourceType: "Research Paper",
-            category: "Edge & Hardware Systems",
-            date: "2026-10-29",
-            keywords: ["Neuromorphic Edge", "Spiking Neural Networks", "Low-Power AI"],
-            summary: "Event-driven spiking neural hardware achieves 14x lower energy per inference than conventional mobile NPUs during high-speed obstacle avoidance.",
-            url: "https://ieee.org/"
-        },
-        {
-            id: "art-105",
-            title: "Open-Weight Small Language Models Gain Traction in Campus Lab Deployments",
-            authors: "L. Morales",
-            venue: "ACM TechNews",
-            sourceType: "Tech News",
-            category: "AI & Machine Learning",
-            date: "2026-10-18",
-            keywords: ["Agentic AI", "Small Language Models", "Local Inference"],
-            summary: "University research groups are increasingly deploying quantized 7B parameter models on local workstation GPUs for privacy-preserving code and data analysis.",
-            url: "https://cacm.acm.org/"
-        },
-        {
-            id: "art-106",
-            title: "Hardware-Enforced Confidential Computing for Federated Hospital Datasets",
-            authors: "H. Al-Mansoor, P. Deshmukh",
-            venue: "USENIX Security Symposium",
-            sourceType: "Research Paper",
-            category: "Cybersecurity",
-            date: "2026-09-25",
-            keywords: ["Confidential Computing", "Post-Quantum Crypto", "Federated AI"],
-            summary: "Combines confidential GPU enclaves with cryptographic attestation to train diagnostic models across multi-institutional clinical repositories without raw data exposure.",
-            url: "https://usenix.org/"
-        },
-        {
-            id: "art-107",
-            title: "RISC-V Vector Extensions Accelerate On-Device Sensor Fusion",
-            authors: "J. Park",
-            venue: "EE Times",
-            sourceType: "Tech News",
-            category: "Edge & Hardware Systems",
-            date: "2026-09-11",
-            keywords: ["Neuromorphic Edge", "RISC-V", "Edge AI"],
-            summary: "New open-standard RISC-V vector silicon targets industrial robotics and smart grid telemetry with deterministic real-time latency.",
-            url: "https://eetimes.com/"
-        }
-    ],
-    trendSeries: {
-        labels: ["Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026", "Oct 2026", "Nov 2026"],
-        keywords: {
-            "Agentic AI":               { data: [48, 66, 92, 124, 165, 218], growth: "+32.1%", color: "#58a6ff" },
-            "Quantum Error Correction": { data: [28, 34, 41, 55, 72, 96],    growth: "+33.3%", color: "#a371f7" },
-            "Neuromorphic Edge":        { data: [30, 39, 51, 64, 79, 102],   growth: "+29.1%", color: "#3fb950" },
-            "Post-Quantum Crypto":      { data: [42, 47, 53, 68, 84, 109],   growth: "+29.8%", color: "#f78166" }
-        }
-    }
-};
-
-// --- APPLICATION STATE ---
-let state = {
+let dashboardState = {
     articles: [],
     trendSeries: null,
-    savedIds: new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")),
-    showSavedOnly: false
+    sourceMode: "curated"
 };
 
-let lineChart = null;
-let barChart = null;
+let lineChartInstance = null;
+let barChartInstance = null;
 let toastInstance = null;
-
-// --- DATA LOADER (Swap with fetch('/api/dashboard') when Python API is connected) ---
-async function fetchDashboardData() {
-    // Example future integration:
-    // const response = await fetch("http://127.0.0.1:8000/api/trends");
-    // return await response.json();
-    return Promise.resolve(MOCK_PAYLOAD);
-}
 
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", async () => {
-    toastInstance = new bootstrap.Toast(document.getElementById("actionToast"), { delay: 2500 });
+    const toastEl = document.getElementById("actionToast");
+    if (toastEl) {
+        toastInstance = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 });
+    }
 
-    const payload = await fetchDashboardData();
-    state.articles = payload.articles;
-    state.trendSeries = payload.trendSeries;
+    // Apply default filter preferences saved in settings.html[cite: 9]
+    applyDefaultSettingsToFilters();
 
-    bindEvents();
+    // Load curated data or live Python backend payload (with automatic fallback)[cite: 9]
+    const payload = await fetchDashboardPayload();
+    dashboardState.articles = payload.data.articles;
+    dashboardState.trendSeries = payload.data.trendSeries;
+    dashboardState.sourceMode = payload.sourceMode;
+
+    updateDatasetBadge(payload.sourceMode, payload.fallbackReason);
+    bindDashboardEvents();
     renderLineChart();
-    updateDashboard();
+    refreshDashboard();
 });
 
-function bindEvents() {
-    // Filter inputs
-    document.getElementById("categoryFilter").addEventListener("change", updateDashboard);
-    document.getElementById("timeFilter").addEventListener("change", updateDashboard);
-    document.getElementById("globalSearchInput").addEventListener("input", updateDashboard);
+function applyDefaultSettingsToFilters() {
+    const settings = getSettings();
 
-    // Source Type radio toggles
+    const categoryEl = document.getElementById("categoryFilter");
+    if (categoryEl && settings.defaultCategory) {
+        const hasOption = Array.from(categoryEl.options).some(opt => opt.value === settings.defaultCategory);
+        if (hasOption) categoryEl.value = settings.defaultCategory;
+    }
+
+    const timeEl = document.getElementById("timeFilter");
+    if (timeEl && settings.defaultTimePeriod) {
+        const hasOption = Array.from(timeEl.options).some(opt => opt.value === settings.defaultTimePeriod);
+        if (hasOption) timeEl.value = settings.defaultTimePeriod;
+    }
+
+    if (settings.defaultSourceType) {
+        const radio = document.querySelector(`input[name="sourceTypeFilter"][value="${settings.defaultSourceType}"]`);
+        if (radio) radio.checked = true;
+    }
+}
+
+function updateDatasetBadge(sourceMode, fallbackReason) {
+    const badge = document.querySelector(".badge.bg-dark.border.border-secondary-subtle");
+    if (!badge) return;
+
+    if (sourceMode === "live") {
+        badge.innerHTML = `<i class="bi bi-broadcast text-success me-1"></i> Dataset: Live Python API`;
+    } else if (fallbackReason) {
+        badge.innerHTML = `<i class="bi bi-database-exclamation text-warning me-1"></i> Dataset: Curated Fallback (${fallbackReason})`;
+    } else {
+        badge.innerHTML = `<i class="bi bi-database-check text-success me-1"></i> Dataset: Curated Academic &amp; Tech Feed`;
+    }
+}
+
+function bindDashboardEvents() {
+    // Dropdown & search filters
+    document.getElementById("categoryFilter")?.addEventListener("change", refreshDashboard);
+    document.getElementById("timeFilter")?.addEventListener("change", refreshDashboard);
+    document.getElementById("globalSearchInput")?.addEventListener("input", refreshDashboard);
+
+    // Source type radio buttons
     document.querySelectorAll('input[name="sourceTypeFilter"]').forEach(radio => {
-        radio.addEventListener("change", updateDashboard);
+        radio.addEventListener("change", refreshDashboard);
     });
 
-    // Compare Keywords checkboxes (Multi-line chart)
+    // Keyword comparison checkboxes (multi-line chart)
     document.querySelectorAll(".kw-toggle").forEach(cb => {
         cb.addEventListener("change", renderLineChart);
     });
 
-    // Sidebar Navigation links
-    document.querySelectorAll("#sidebarNav .nav-link").forEach(link => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            document.querySelectorAll("#sidebarNav .nav-link").forEach(l => l.classList.remove("active"));
-            link.classList.add("active");
+    // Reset filters button
+    document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
+        const categoryEl = document.getElementById("categoryFilter");
+        const timeEl = document.getElementById("timeFilter");
+        const searchEl = document.getElementById("globalSearchInput");
+        const srcAllEl = document.getElementById("srcAll");
 
-            const view = link.dataset.view;
-            if (view === "saved") {
-                state.showSavedOnly = true;
-                document.getElementById("dashboardTitle").textContent = "Saved Reading List";
-                document.getElementById("feedSectionHeading").textContent = "Bookmarked Research Papers & Articles";
-            } else {
-                state.showSavedOnly = false;
-                document.getElementById("dashboardTitle").textContent = "Main Trend Dashboard";
-                document.getElementById("feedSectionHeading").textContent = "Categorized Research & Tech News Feed";
-                if (view !== "dashboard") {
-                    showToast(`Switched preview context: ${link.textContent.trim()}`);
-                }
-            }
-            updateDashboard();
-        });
-    });
+        if (categoryEl) categoryEl.value = "All";
+        if (timeEl) timeEl.value = "all";
+        if (searchEl) searchEl.value = "";
+        if (srcAllEl) srcAllEl.checked = true;
 
-    // KPI "View Saved" shortcut button
-    document.getElementById("toggleSavedOnlyBtn").addEventListener("click", () => {
-        state.showSavedOnly = !state.showSavedOnly;
-        const targetView = state.showSavedOnly ? "saved" : "dashboard";
-        document.querySelectorAll("#sidebarNav .nav-link").forEach(l => {
-            l.classList.toggle("active", l.dataset.view === targetView);
-        });
-        document.getElementById("dashboardTitle").textContent = state.showSavedOnly
-            ? "Saved Reading List"
-            : "Main Trend Dashboard";
-        updateDashboard();
-    });
+        const kwAgentic = document.getElementById("kwAgentic");
+        const kwQuantum = document.getElementById("kwQuantum");
+        const kwEdge = document.getElementById("kwEdge");
+        const kwCrypto = document.getElementById("kwCrypto");
 
-    // Reset Filters
-    document.getElementById("resetFiltersBtn").addEventListener("click", () => {
-        document.getElementById("categoryFilter").value = "All";
-        document.getElementById("timeFilter").value = "all";
-        document.getElementById("globalSearchInput").value = "";
-        document.getElementById("srcAll").checked = true;
-        state.showSavedOnly = false;
-
-        document.querySelectorAll("#sidebarNav .nav-link").forEach(l => {
-            l.classList.toggle("active", l.dataset.view === "dashboard");
-        });
-        document.getElementById("dashboardTitle").textContent = "Main Trend Dashboard";
-
-        // Reset trend checkboxes to default 3
-        document.getElementById("kwAgentic").checked = true;
-        document.getElementById("kwQuantum").checked = true;
-        document.getElementById("kwEdge").checked = true;
-        document.getElementById("kwCrypto").checked = false;
+        if (kwAgentic) kwAgentic.checked = true;
+        if (kwQuantum) kwQuantum.checked = true;
+        if (kwEdge) kwEdge.checked = true;
+        if (kwCrypto) kwCrypto.checked = false;
 
         renderLineChart();
-        updateDashboard();
-        showToast("All filters reset to default view.");
+        refreshDashboard();
+        showDashboardToast("All filters reset to default view.");
     });
 }
 
 // --- FILTERING & MASTER REFRESH ---
 function getFilteredArticles() {
-    const category = document.getElementById("categoryFilter").value;
-    const days = document.getElementById("timeFilter").value;
-    const search = document.getElementById("globalSearchInput").value.trim().toLowerCase();
-    const sourceType = document.querySelector('input[name="sourceTypeFilter"]:checked').value;
+    const category = document.getElementById("categoryFilter")?.value || "All";
+    const days = document.getElementById("timeFilter")?.value || "all";
+    const search = (document.getElementById("globalSearchInput")?.value || "").trim().toLowerCase();
+    const sourceType = document.querySelector('input[name="sourceTypeFilter"]:checked')?.value || "All";
 
-    return state.articles.filter(article => {
-        if (state.showSavedOnly && !state.savedIds.has(article.id)) return false;
+    return dashboardState.articles.filter(article => {
         if (category !== "All" && article.category !== category) return false;
         if (sourceType !== "All" && article.sourceType !== sourceType) return false;
 
         if (days !== "all") {
-            const pubDate = new Date(article.date + "T00:00:00");
+            const pubDate = new Date((article.date || "2026-11-19") + "T00:00:00");
             const diffDays = (REFERENCE_DATE - pubDate) / (1000 * 60 * 60 * 24);
             if (diffDays > parseInt(days, 10)) return false;
         }
 
         if (search) {
-            const inTitle = article.title.toLowerCase().includes(search);
-            const inSummary = article.summary.toLowerCase().includes(search);
-            const inKeywords = article.keywords.some(k => k.toLowerCase().includes(search));
-            if (!inTitle && !inSummary && !inKeywords) return false;
+            const inTitle = (article.title || "").toLowerCase().includes(search);
+            const inSummary = (article.summary || "").toLowerCase().includes(search);
+            const inAuthors = (article.authors || "").toLowerCase().includes(search);
+            const inKeywords = (article.keywords || []).some(k => k.toLowerCase().includes(search));
+            if (!inTitle && !inSummary && !inAuthors && !inKeywords) return false;
         }
 
         return true;
     });
 }
 
-function updateDashboard() {
+function refreshDashboard() {
     const filtered = getFilteredArticles();
-    updateKPIs(filtered);
+    updateDashboardKPIs(filtered);
     renderBarChart(filtered);
-    renderArticles(filtered);
+    renderArticleFeed(filtered);
 }
 
-// --- UPDATE 4 KPI CARDS ---
-function updateKPIs(filtered) {
+// --- UPDATE 4 KPI SUMMARY CARDS ---
+function updateDashboardKPIs(filtered) {
+    const savedIds = getSavedIds();
+
     // 1. Articles Analyzed
-    document.getElementById("kpiArticlesCount").textContent = filtered.length;
-    const paperCount = filtered.filter(a => a.sourceType === "Research Paper").length;
-    const newsCount = filtered.filter(a => a.sourceType === "Tech News").length;
-    document.getElementById("kpiSourceSplit").textContent = `${paperCount} Papers • ${newsCount} News`;
+    const countEl = document.getElementById("kpiArticlesCount");
+    const splitEl = document.getElementById("kpiSourceSplit");
+    if (countEl) countEl.textContent = filtered.length;
+    if (splitEl) {
+        const paperCount = filtered.filter(a => a.sourceType === "Research Paper").length;
+        const newsCount = filtered.filter(a => a.sourceType === "Tech News").length;
+        splitEl.textContent = `${paperCount} Papers • ${newsCount} News`;
+    }
 
     // 2. Top Emerging Keyword
+    const topKwEl = document.getElementById("kpiTopKeyword");
+    const growthEl = document.getElementById("kpiKeywordGrowth");
     const kwFreq = {};
-    filtered.forEach(a => a.keywords.forEach(k => kwFreq[k] = (kwFreq[k] || 0) + 1));
+    filtered.forEach(a => (a.keywords || []).forEach(k => {
+        kwFreq[k] = (kwFreq[k] || 0) + 1;
+    }));
     const sortedKws = Object.keys(kwFreq).sort((a, b) => kwFreq[b] - kwFreq[a]);
 
-    if (sortedKws.length > 0) {
-        const topKw = sortedKws[0];
-        const growth = state.trendSeries.keywords[topKw]?.growth || "+24.5%";
-        document.getElementById("kpiTopKeyword").textContent = topKw;
-        document.getElementById("kpiKeywordGrowth").textContent = growth;
-    } else {
-        document.getElementById("kpiTopKeyword").textContent = "N/A";
-        document.getElementById("kpiKeywordGrowth").textContent = "0%";
+    if (topKwEl && growthEl) {
+        if (sortedKws.length > 0) {
+            const topKw = sortedKws[0];
+            const seriesInfo = dashboardState.trendSeries?.keywords?.[topKw];
+            topKwEl.textContent = topKw;
+            growthEl.textContent = seriesInfo?.growth || "+24.5%";
+        } else {
+            topKwEl.textContent = "N/A";
+            growthEl.textContent = "0%";
+        }
     }
 
     // 3. Most Active Category
-    if (filtered.length > 0) {
-        const catCounts = {};
-        filtered.forEach(a => catCounts[a.category] = (catCounts[a.category] || 0) + 1);
-        const topCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] >= catCounts[b] ? a : b);
-        const sharePct = Math.round((catCounts[topCat] / filtered.length) * 100);
-        document.getElementById("kpiTopCategory").textContent = topCat;
-        document.getElementById("kpiCategoryShare").textContent = `${sharePct}% share`;
-    } else {
-        document.getElementById("kpiTopCategory").textContent = "N/A";
-        document.getElementById("kpiCategoryShare").textContent = "0%";
+    const topCatEl = document.getElementById("kpiTopCategory");
+    const shareEl = document.getElementById("kpiCategoryShare");
+    if (topCatEl && shareEl) {
+        if (filtered.length > 0) {
+            const catCounts = {};
+            filtered.forEach(a => {
+                catCounts[a.category] = (catCounts[a.category] || 0) + 1;
+            });
+            const topCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] >= catCounts[b] ? a : b);
+            const sharePct = Math.round((catCounts[topCat] / filtered.length) * 100);
+            topCatEl.textContent = topCat;
+            shareEl.textContent = `${sharePct}% share`;
+        } else {
+            topCatEl.textContent = "N/A";
+            shareEl.textContent = "0%";
+        }
     }
 
     // 4. Saved Reading Items
-    document.getElementById("kpiSavedCount").textContent = state.savedIds.size;
-    document.getElementById("navSavedBadge").textContent = state.savedIds.size;
-    document.getElementById("toggleSavedOnlyBtn").textContent = state.showSavedOnly ? "Show All" : "View Saved";
+    const savedCountEl = document.getElementById("kpiSavedCount");
+    if (savedCountEl) savedCountEl.textContent = savedIds.size;
+    updateNavSavedBadge();
 }
 
 // --- MULTI-LINE TREND COMPARISON CHART ---
 function renderLineChart() {
+    const canvas = document.getElementById("trendLineChart");
+    if (!canvas || !dashboardState.trendSeries) return;
+
     const selectedKeywords = Array.from(document.querySelectorAll(".kw-toggle:checked")).map(cb => cb.value);
-    const datasets = selectedKeywords.map(kw => {
-        const series = state.trendSeries.keywords[kw];
-        return {
-            label: kw,
-            data: series.data,
-            borderColor: series.color,
-            backgroundColor: series.color + "22",
-            borderWidth: 2.5,
-            tension: 0.35,
-            pointRadius: 4,
-            pointHoverRadius: 6
-        };
-    });
+    const datasets = selectedKeywords
+        .filter(kw => Boolean(dashboardState.trendSeries.keywords?.[kw]))
+        .map(kw => {
+            const series = dashboardState.trendSeries.keywords[kw];
+            return {
+                label: kw,
+                data: series.data,
+                borderColor: series.color,
+                backgroundColor: `${series.color}22`,
+                borderWidth: 2.5,
+                tension: 0.35,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            };
+        });
 
-    const ctx = document.getElementById("trendLineChart").getContext("2d");
-    if (lineChart) lineChart.destroy();
+    const ctx = canvas.getContext("2d");
+    if (lineChartInstance) lineChartInstance.destroy();
 
-    lineChart = new Chart(ctx, {
+    lineChartInstance = new Chart(ctx, {
         type: "line",
         data: {
-            labels: state.trendSeries.labels,
+            labels: dashboardState.trendSeries.labels,
             datasets
         },
         options: {
@@ -347,9 +269,12 @@ function renderLineChart() {
 
 // --- KEYWORD FREQUENCY BAR CHART ---
 function renderBarChart(filtered) {
+    const canvas = document.getElementById("keywordBarChart");
+    if (!canvas) return;
+
     const kwCounts = {};
     filtered.forEach(article => {
-        article.keywords.forEach(kw => {
+        (article.keywords || []).forEach(kw => {
             kwCounts[kw] = (kwCounts[kw] || 0) + 1;
         });
     });
@@ -357,10 +282,10 @@ function renderBarChart(filtered) {
     const labels = Object.keys(kwCounts).sort((a, b) => kwCounts[b] - kwCounts[a]).slice(0, 7);
     const values = labels.map(l => kwCounts[l]);
 
-    const ctx = document.getElementById("keywordBarChart").getContext("2d");
-    if (barChart) barChart.destroy();
+    const ctx = canvas.getContext("2d");
+    if (barChartInstance) barChartInstance.destroy();
 
-    barChart = new Chart(ctx, {
+    barChartInstance = new Chart(ctx, {
         type: "bar",
         data: {
             labels,
@@ -395,10 +320,13 @@ function renderBarChart(filtered) {
     });
 }
 
-// --- ARTICLE CARDS & ACADEMIC ACTIONS ---
-function renderArticles(articles) {
+// --- ARTICLE CARDS, SUMMARIES & ACADEMIC ACTIONS ---
+function renderArticleFeed(articles) {
     const container = document.getElementById("articlesFeedContainer");
-    document.getElementById("feedCountBadge").textContent = articles.length;
+    const badgeEl = document.getElementById("feedCountBadge");
+    if (!container) return;
+
+    if (badgeEl) badgeEl.textContent = articles.length;
 
     if (articles.length === 0) {
         container.innerHTML = `
@@ -411,8 +339,10 @@ function renderArticles(articles) {
         return;
     }
 
+    const savedIds = getSavedIds();
+
     container.innerHTML = articles.map(article => {
-        const isSaved = state.savedIds.has(article.id);
+        const isSaved = savedIds.has(article.id);
         const sourceBadgeClass = article.sourceType === "Research Paper" ? "source-pill-paper" : "source-pill-news";
         const sourceIcon = article.sourceType === "Research Paper" ? "bi-journal-text" : "bi-newspaper";
 
@@ -427,15 +357,15 @@ function renderArticles(articles) {
                             <i class="bi ${sourceIcon} me-1"></i>${article.sourceType}
                         </span>
                         <span class="text-secondary small">
-                            <i class="bi bi-calendar3 me-1"></i>${article.date} • ${article.venue}
+                            <i class="bi bi-calendar3 me-1"></i>${article.date} • ${article.venue || ""}
                         </span>
                     </div>
 
-                    <!-- Academic Action Buttons -->
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <button
+                            type="button"
                             class="btn btn-sm ${isSaved ? "btn-warning" : "btn-outline-secondary"}"
-                            onclick="toggleBookmark('${article.id}')"
+                            onclick="handleToggleBookmark('${article.id}')"
                             title="Save to Reading List"
                         >
                             <i class="bi ${isSaved ? "bi-bookmark-fill" : "bi-bookmark"} me-1"></i>
@@ -443,8 +373,9 @@ function renderArticles(articles) {
                         </button>
 
                         <button
+                            type="button"
                             class="btn btn-sm btn-outline-secondary"
-                            onclick="copyCitation('${article.id}')"
+                            onclick="handleCopyCitation('${article.id}')"
                             title="Copy Academic Citation"
                         >
                             <i class="bi bi-quote me-1"></i>Copy Citation
@@ -468,55 +399,53 @@ function renderArticles(articles) {
 
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-1">
                     <div>
-                        ${article.keywords.map(kw => `
-                            <span class="keyword-pill" onclick="filterByKeyword('${kw}')">#${kw}</span>
+                        ${(article.keywords || []).map(kw => `
+                            <span class="keyword-pill" onclick="handleFilterByKeyword('${kw.replace(/'/g, "\\'")}')">#${kw}</span>
                         `).join("")}
                     </div>
-                    <span class="text-secondary small fst-italic">Authors: ${article.authors}</span>
+                    <span class="text-secondary small fst-italic">Authors: ${article.authors || "Unknown"}</span>
                 </div>
             </article>
         `;
     }).join("");
 }
 
-// --- INTERACTIVE ACADEMIC HELPERS ---
-window.toggleBookmark = function(articleId) {
-    if (state.savedIds.has(articleId)) {
-        state.savedIds.delete(articleId);
-        showToast("Removed from Saved Reading List.");
-    } else {
-        state.savedIds.add(articleId);
-        showToast("Saved to Reading List.");
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(state.savedIds)));
-    updateDashboard();
+// --- GLOBAL HANDLERS FOR INLINE BUTTONS ---
+window.handleToggleBookmark = function(articleId) {
+    const isSavedNow = toggleSavedArticleId(articleId);
+    showDashboardToast(isSavedNow ? "Saved to Reading List." : "Removed from Saved Reading List.");
+    refreshDashboard();
 };
 
-window.copyCitation = function(articleId) {
-    const article = state.articles.find(a => a.id === articleId);
+window.handleCopyCitation = function(articleId) {
+    const article = dashboardState.articles.find(a => a.id === articleId);
     if (!article) return;
 
-    const year = article.date.slice(0, 4);
-    const citation = `${article.authors} (${year}). "${article.title}." ${article.venue}. Available at: ${article.url}`;
-
+    const citation = formatCitation(article, "APA");
     navigator.clipboard.writeText(citation).then(() => {
-        showToast("Citation copied to clipboard!");
+        showDashboardToast("Citation copied to clipboard!");
     }).catch(() => {
-        showToast("Unable to access clipboard.");
+        showDashboardToast("Unable to access clipboard.", true);
     });
 };
 
-window.filterByKeyword = function(keyword) {
+window.handleFilterByKeyword = function(keyword) {
     const searchInput = document.getElementById("globalSearchInput");
-    searchInput.value = keyword;
-    updateDashboard();
-    showToast(`Filtered by keyword: #${keyword}`);
+    if (searchInput) {
+        searchInput.value = keyword;
+    }
+    refreshDashboard();
+    showDashboardToast(`Filtered by keyword: #${keyword}`);
 };
 
-function showToast(message) {
-    document.getElementById("toastMessage").innerHTML = `
-        <i class="bi bi-check-circle-fill text-success"></i>
-        <span>${message}</span>
-    `;
-    toastInstance.show();
+function showDashboardToast(message, isError = false) {
+    if (typeof triggerToast === "function") {
+        triggerToast(message, isError);
+        return;
+    }
+    const msgEl = document.getElementById("toastMessage");
+    if (msgEl && toastInstance) {
+        msgEl.innerHTML = `<i class="bi ${isError ? "bi-exclamation-triangle-fill text-warning" : "bi-check-circle-fill text-success"}"></i><span>${message}</span>`;
+        toastInstance.show();
+    }
 }
