@@ -18,7 +18,7 @@
         <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between gap-2">
             <!-- Brand & Academic Badge -->
             <div class="d-flex align-items-center gap-3">
-                <a class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0" href="index.html">
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0" href="#">
                     <span class="brand-icon"><i class="bi bi-cpu-fill"></i></span>
                     <span>Emerging Technology Trend Identifier</span>
                 </a>
@@ -56,17 +56,17 @@
                     <div class="sidebar-section-title">Workspace</div>
                     <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
                         <li class="nav-item">
-                            <a class="nav-link active d-flex align-items-center gap-2" href="index.html">
+                            <a class="nav-link active d-flex align-items-center gap-2" href="#dashboard" data-view="dashboard">
                                 <i class="bi bi-grid-1x2-fill"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2" href="feeds.html">
+                            <a class="nav-link d-flex align-items-center gap-2" href="#feeds" data-view="feeds">
                                 <i class="bi bi-rss-fill"></i> Data Sources / Feeds
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center justify-content-between" href="saved.html">
+                            <a class="nav-link d-flex align-items-center justify-content-between" href="#saved" data-view="saved">
                                 <span class="d-flex align-items-center gap-2">
                                     <i class="bi bi-bookmark-star-fill"></i> Saved Reading List
                                 </span>
@@ -74,7 +74,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-2" href="settings.html">
+                            <a class="nav-link d-flex align-items-center gap-2" href="#settings" data-view="settings">
                                 <i class="bi bi-gear-fill"></i> Settings
                             </a>
                         </li>
@@ -238,9 +238,9 @@
                                 </div>
                                 <div class="d-flex align-items-baseline justify-content-between">
                                     <h3 class="fw-bold mb-0" id="kpiSavedCount">0</h3>
-                                    <a href="saved.html" class="btn btn-link btn-sm p-0 text-decoration-none">
+                                    <button id="toggleSavedOnlyBtn" class="btn btn-link btn-sm p-0 text-decoration-none">
                                         View Saved
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -307,7 +307,7 @@
                     </div>
 
                     <div class="card-body" id="articlesFeedContainer">
-                        <!-- Rendered dynamically via js/app.js -->
+                        <!-- Rendered dynamically via app.js -->
                     </div>
                 </div>
 
@@ -332,8 +332,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Shared State & Application Logic -->
-    <script src="js/shared.js"></script>
-    <script src="js/app.js"></script>
+    <!-- Application Logic -->
+    <script src="app.js"></script>
 </body>
 </html>
