@@ -16,7 +16,7 @@ const DEFAULT_SETTINGS = {
     defaultCategory: "All",
     defaultTimePeriod: "all",
     defaultSourceType: "All",
-    itemsPerPage: 10
+    itemsPerPage: 10,
     uiTheme: "dark",
     cardDensity: "comfortable",
     enableChartAnimations: true,
@@ -357,8 +357,6 @@ function triggerToast(message, isError = false) {
     msgEl.innerHTML = `<i class="bi ${iconClass}"></i><span>${message}</span>`;
     bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 }).show();
 }
-
-document.addEventListener("DOMContentLoaded", updateNavSavedBadge);
 
 function applyUserTheme(themeOverride = null) {
     const settings = getSettings();
