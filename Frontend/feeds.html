@@ -42,53 +42,6 @@
                     >
                 </div>
             </div>
-
-            <!-- Login / Profile Section -->
-            <div class="d-flex align-items-center gap-2">
-                <button
-                    class="btn btn-outline-primary btn-sm"
-                    id="headerLoginBtn"
-                    type="button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loginModal"
-                    hidden
-                >
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                </button>
-
-                <div class="dropdown" id="headerProfileMenu" hidden>
-                    <button
-                        class="btn btn-outline-light btn-sm dropdown-toggle"
-                        type="button"
-                        id="profileDropdownButton"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
-                        <i class="bi bi-person-circle me-1"></i>
-                        <span id="headerProfileName">Profile</span>
-                    </button>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li class="px-3 py-2">
-                            <div class="fw-semibold" id="dropdownProfileName">User</div>
-                            <div class="small text-secondary" id="dropdownProfileEmail">user@demo.edu</div>
-                            <span class="badge bg-primary-subtle text-primary mt-1" id="dropdownProfileRole">Student</span>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <button class="dropdown-item" type="button" id="viewProfileBtn">
-                                <i class="bi bi-person-vcard me-2"></i>View Profile
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-danger" type="button" id="logoutBtn">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
         </div>
     </nav>
 
@@ -233,87 +186,6 @@
         </div>
     </div>
 
-
-    <!-- Login Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-person-lock text-primary me-2"></i>Login
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="loginForm">
-                        <label class="form-label fw-semibold">Account Type</label>
-
-                        <div class="d-flex gap-3 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="loginRole" id="loginStudent" value="student" checked>
-                                <label class="form-check-label" for="loginStudent">Student</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="loginRole" id="loginFaculty" value="staff">
-                                <label class="form-check-label" for="loginFaculty">Faculty</label>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="loginIdentifier" class="form-label">Email</label>
-                            <input type="email" class="form-control bg-dark text-light border-secondary" id="loginIdentifier" placeholder="Enter your demo email" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="loginPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control bg-dark text-light border-secondary" id="loginPassword" placeholder="Enter password" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title fw-bold">
-                        <i class="bi bi-person-vcard text-primary me-2"></i>My Profile
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="text-center mb-4">
-                        <i class="bi bi-person-circle display-3 text-primary"></i>
-                        <h5 class="mt-2 mb-1" id="profileDisplayName">User</h5>
-                        <span class="badge bg-primary-subtle text-primary" id="profileDisplayRole">Student</span>
-                    </div>
-
-                    <div class="border rounded p-3 border-secondary">
-                        <p class="mb-2"><strong>Email:</strong> <span id="profileDisplayEmail"></span></p>
-                        <p class="mb-2"><strong>ID:</strong> <span id="profileDisplayId"></span></p>
-                        <p class="mb-2"><strong>Department:</strong> <span id="profileDisplayDepartment"></span></p>
-                        <p class="mb-0"><strong>College:</strong> <span id="profileDisplayCollege"></span></p>
-
-                        <div id="profileExtraRow" class="mt-2" hidden>
-                            <strong id="profileExtraLabel"></strong>
-                            <span id="profileDisplayExtra"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <!-- Toast Notification -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="actionToast" class="toast align-items-center text-bg-dark border-primary" role="alert" aria-live="assertive" aria-atomic="true">
@@ -332,6 +204,5 @@
     <!-- Shared State & Feed Logic -->
     <script src="js/shared.js"></script>
     <script src="js/feeds.js"></script>
-    <script src="js/auth.js"></script>
 </body>
 </html>
