@@ -1,5 +1,7 @@
+
 /**
- * Emerging Technology Trend Identifier - Shared State, API Fetcher & Helpers
+ * Emerging Technology Trend Identifier
+ * Shared State, API Fetcher & Helpers
  * Shared across index.html, feeds.html, saved.html, and settings.html.
  */
 
@@ -8,6 +10,35 @@ const STORAGE_KEYS = {
     SETTINGS: "etti_user_settings",
     FEEDS: "etti_data_feeds"
 };
+
+// Demo authentication session created by settings.js.
+// Saved articles and preferences are separated by logged-in demo account.
+const DEMO_SESSION_STORAGE_KEY = "ett_demo_user";
+
+function getCurrentUserStorageId() {
+    try {
+        const session = JSON.parse(
+            localStorage.getItem(DEMO_SESSION_STORAGE_KEY) || "null"
+        );
+
+        const role = session?.role;
+
+        // Only accept the two supported demo roles.
+        if (role === "student" || role === "staff") {
+            return role;
+        }
+    } catch (error) {
+        // Treat invalid or missing session as guest.
+    }
+
+    return "guest";
+}
+
+function getUserStorageKey(baseKey) {
+    return `${baseKey}_${getCurrentUserStorageId()}`;
+}
+
+// --- DEFAULT SETTINGS ---
 
 const DEFAULT_SETTINGS = {
     apiBaseUrl: "http://127.0.0.1:8000/api",
@@ -21,8 +52,10 @@ const DEFAULT_SETTINGS = {
     cardDensity: "comfortable",
     enableChartAnimations: true,
     defaultCitationStyle: "APA",
-    showSummariesByDefault: true,
+    showSummariesByDefault: true
 };
+
+// --- DEFAULT DATA FEEDS ---
 
 const DEFAULT_FEEDS = [
     {
@@ -67,7 +100,10 @@ const DEFAULT_FEEDS = [
     }
 ];
 
-// Curated Mock Dataset (Fallback when offline or before Python backend is connected)
+// --- CURATED MOCK DATA ---
+// Temporary fallback for offline mode or before backend integration.
+// Live backend data should replace this data when available.
+
 const CURATED_DATA = {
     articles: [
         {
@@ -78,7 +114,11 @@ const CURATED_DATA = {
             sourceType: "Research Paper",
             category: "AI & Machine Learning",
             date: "2026-11-16",
-            keywords: ["Agentic AI", "LLM", "Automated Research"],
+            keywords: [
+                "Agentic AI",
+                "LLM",
+                "Automated Research"
+            ],
             summary: "Introduces a self-verifying multi-agent architecture capable of decomposing complex domain queries, retrieving peer-reviewed citations, and reducing hallucination rates by 41%.",
             url: "https://arxiv.org/"
         },
@@ -90,7 +130,11 @@ const CURATED_DATA = {
             sourceType: "Research Paper",
             category: "Quantum Computing",
             date: "2026-11-14",
-            keywords: ["Quantum Error Correction", "Logical Qubits", "Fault Tolerance"],
+            keywords: [
+                "Quantum Error Correction",
+                "Logical Qubits",
+                "Fault Tolerance"
+            ],
             summary: "Demonstrates sustained error suppression across scaled superconducting qubit arrays, establishing a reproducible baseline for fault-tolerant quantum algorithms.",
             url: "https://nature.com/"
         },
@@ -102,7 +146,11 @@ const CURATED_DATA = {
             sourceType: "Tech News",
             category: "Cybersecurity",
             date: "2026-11-08",
-            keywords: ["Post-Quantum Crypto", "Zero Trust", "TLS 1.3"],
+            keywords: [
+                "Post-Quantum Crypto",
+                "Zero Trust",
+                "TLS 1.3"
+            ],
             summary: "Major cloud and enterprise infrastructure operators have completed rollouts of ML-KEM lattice cryptography to mitigate harvest-now, decrypt-later threats.",
             url: "https://spectrum.ieee.org/"
         },
@@ -114,7 +162,11 @@ const CURATED_DATA = {
             sourceType: "Research Paper",
             category: "Edge & Hardware Systems",
             date: "2026-10-29",
-            keywords: ["Neuromorphic Edge", "Spiking Neural Networks", "Low-Power AI"],
+            keywords: [
+                "Neuromorphic Edge",
+                "Spiking Neural Networks",
+                "Low-Power AI"
+            ],
             summary: "Event-driven spiking neural hardware achieves 14x lower energy per inference than conventional mobile NPUs during high-speed obstacle avoidance.",
             url: "https://ieee.org/"
         },
@@ -126,7 +178,11 @@ const CURATED_DATA = {
             sourceType: "Tech News",
             category: "AI & Machine Learning",
             date: "2026-10-18",
-            keywords: ["Agentic AI", "Small Language Models", "Local Inference"],
+            keywords: [
+                "Agentic AI",
+                "Small Language Models",
+                "Local Inference"
+            ],
             summary: "University research groups are increasingly deploying quantized 7B parameter models on local workstation GPUs for privacy-preserving code and data analysis.",
             url: "https://cacm.acm.org/"
         },
@@ -138,7 +194,11 @@ const CURATED_DATA = {
             sourceType: "Research Paper",
             category: "Cybersecurity",
             date: "2026-09-25",
-            keywords: ["Confidential Computing", "Post-Quantum Crypto", "Federated AI"],
+            keywords: [
+                "Confidential Computing",
+                "Post-Quantum Crypto",
+                "Federated AI"
+            ],
             summary: "Combines confidential GPU enclaves with cryptographic attestation to train diagnostic models across multi-institutional clinical repositories without raw data exposure.",
             url: "https://usenix.org/"
         },
@@ -150,29 +210,45 @@ const CURATED_DATA = {
             sourceType: "Tech News",
             category: "Edge & Hardware Systems",
             date: "2026-09-11",
-            keywords: ["Neuromorphic Edge", "RISC-V", "Edge AI"],
+            keywords: [
+                "Neuromorphic Edge",
+                "RISC-V",
+                "Edge AI"
+            ],
             summary: "New open-standard RISC-V vector silicon targets industrial robotics and smart grid telemetry with deterministic real-time latency.",
             url: "https://eetimes.com/"
         }
     ],
+
     trendSeries: {
-        labels: ["Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026", "Oct 2026", "Nov 2026"],
+        labels: [
+            "Jun 2026",
+            "Jul 2026",
+            "Aug 2026",
+            "Sep 2026",
+            "Oct 2026",
+            "Nov 2026"
+        ],
+
         keywords: {
             "Agentic AI": {
                 data: [48, 66, 92, 124, 165, 218],
                 growth: "+32.1%",
                 color: "#58a6ff"
             },
+
             "Quantum Error Correction": {
                 data: [28, 34, 41, 55, 72, 96],
                 growth: "+33.3%",
                 color: "#a371f7"
             },
+
             "Neuromorphic Edge": {
                 data: [30, 39, 51, 64, 79, 102],
                 growth: "+29.1%",
                 color: "#3fb950"
             },
+
             "Post-Quantum Crypto": {
                 data: [42, 47, 53, 68, 84, 109],
                 growth: "+29.8%",
@@ -182,24 +258,49 @@ const CURATED_DATA = {
     }
 };
 
-// --- BOOKMARKS / SAVED READING LIST STATE ---
+
+// =====================================================
+// BOOKMARKS / SAVED READING LIST
+// =====================================================
+
 function getSavedIds() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEYS.SAVED_IDS);
-        return new Set(raw ? JSON.parse(raw) : []);
-    } catch {
+        const storageKey = getUserStorageKey(
+            STORAGE_KEYS.SAVED_IDS
+        );
+
+        const raw = localStorage.getItem(storageKey);
+
+        return new Set(
+            raw ? JSON.parse(raw) : []
+        );
+
+    } catch (error) {
+        console.error("Unable to load saved articles:", error);
         return new Set();
     }
 }
 
+
 function saveIds(idSet) {
-    localStorage.setItem(STORAGE_KEYS.SAVED_IDS, JSON.stringify(Array.from(idSet)));
+    const storageKey = getUserStorageKey(
+        STORAGE_KEYS.SAVED_IDS
+    );
+
+    localStorage.setItem(
+        storageKey,
+        JSON.stringify(Array.from(idSet))
+    );
+
     updateNavSavedBadge();
 }
 
+
 function toggleSavedArticleId(articleId) {
     const ids = getSavedIds();
+
     let isSavedNow = false;
+
     if (ids.has(articleId)) {
         ids.delete(articleId);
         isSavedNow = false;
@@ -207,57 +308,126 @@ function toggleSavedArticleId(articleId) {
         ids.add(articleId);
         isSavedNow = true;
     }
+
     saveIds(ids);
+
     return isSavedNow;
 }
 
+
 function updateNavSavedBadge() {
     const badge = document.getElementById("navSavedBadge");
+
     if (badge) {
         badge.textContent = getSavedIds().size;
     }
 }
 
-// --- SETTINGS STATE ---
+
+// =====================================================
+// USER SETTINGS
+// =====================================================
+
 function getSettings() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-        return { ...DEFAULT_SETTINGS, ...(raw ? JSON.parse(raw) : {}) };
-    } catch {
-        return { ...DEFAULT_SETTINGS };
+        const storageKey = getUserStorageKey(
+            STORAGE_KEYS.SETTINGS
+        );
+
+        const raw = localStorage.getItem(storageKey);
+
+        return {
+            ...DEFAULT_SETTINGS,
+            ...(raw ? JSON.parse(raw) : {})
+        };
+
+    } catch (error) {
+        console.error("Unable to load settings:", error);
+
+        return {
+            ...DEFAULT_SETTINGS
+        };
     }
 }
 
+
 function saveSettings(newSettings) {
-    const merged = { ...DEFAULT_SETTINGS, ...newSettings };
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(merged));
+    const merged = {
+        ...DEFAULT_SETTINGS,
+        ...newSettings
+    };
+
+    const storageKey = getUserStorageKey(
+        STORAGE_KEYS.SETTINGS
+    );
+
+    localStorage.setItem(
+        storageKey,
+        JSON.stringify(merged)
+    );
+
     return merged;
 }
 
+
 function resetSettingsToDefault() {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
-    return { ...DEFAULT_SETTINGS };
+    const storageKey = getUserStorageKey(
+        STORAGE_KEYS.SETTINGS
+    );
+
+    localStorage.setItem(
+        storageKey,
+        JSON.stringify(DEFAULT_SETTINGS)
+    );
+
+    return {
+        ...DEFAULT_SETTINGS
+    };
 }
 
-// --- DATA FEEDS STATE ---
+
+// =====================================================
+// DATA FEEDS
+// =====================================================
+
 function getFeeds() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEYS.FEEDS);
-        return raw ? JSON.parse(raw) : [...DEFAULT_FEEDS];
-    } catch {
+        const raw = localStorage.getItem(
+            STORAGE_KEYS.FEEDS
+        );
+
+        return raw
+            ? JSON.parse(raw)
+            : [...DEFAULT_FEEDS];
+
+    } catch (error) {
+        console.error("Unable to load feeds:", error);
         return [...DEFAULT_FEEDS];
     }
 }
 
+
 function saveFeeds(feeds) {
-    localStorage.setItem(STORAGE_KEYS.FEEDS, JSON.stringify(feeds));
+    localStorage.setItem(
+        STORAGE_KEYS.FEEDS,
+        JSON.stringify(feeds)
+    );
 }
 
-// --- API FETCHER WITH CURATED FALLBACK ---
+
+// =====================================================
+// API FETCHER WITH CURATED FALLBACK
+// =====================================================
+
 async function fetchDashboardPayload() {
     const settings = getSettings();
-    const baseUrl = (settings.apiBaseUrl || DEFAULT_SETTINGS.apiBaseUrl).replace(/\/+$/, "");
 
+    const baseUrl = (
+        settings.apiBaseUrl ||
+        DEFAULT_SETTINGS.apiBaseUrl
+    ).replace(/\/+$/, "");
+
+    // Use curated fallback when live API is disabled.
     if (!settings.useLiveApi) {
         return {
             data: CURATED_DATA,
@@ -267,14 +437,24 @@ async function fetchDashboardPayload() {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), settings.apiTimeoutMs || 5000);
+
+    const timeoutId = setTimeout(
+        () => controller.abort(),
+        settings.apiTimeoutMs || 5000
+    );
 
     try {
-        const response = await fetch(`${baseUrl}/dashboard`, {
-            method: "GET",
-            headers: { Accept: "application/json" },
-            signal: controller.signal
-        });
+        const response = await fetch(
+            `${baseUrl}/dashboard`,
+            {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                },
+                signal: controller.signal
+            }
+        );
+
         clearTimeout(timeoutId);
 
         if (!response.ok) {
@@ -282,44 +462,76 @@ async function fetchDashboardPayload() {
         }
 
         const json = await response.json();
+
         return {
             data: {
-                articles: Array.isArray(json.articles) ? json.articles : CURATED_DATA.articles,
-                trendSeries: json.trendSeries || CURATED_DATA.trendSeries
+                articles: Array.isArray(json.articles)
+                    ? json.articles
+                    : CURATED_DATA.articles,
+
+                trendSeries: json.trendSeries ||
+                    CURATED_DATA.trendSeries
             },
+
             sourceMode: "live",
             fallbackReason: null
         };
+
     } catch (error) {
         clearTimeout(timeoutId);
+
         return {
             data: CURATED_DATA,
             sourceMode: "curated",
-            fallbackReason: error.message || "Backend unreachable"
+            fallbackReason: error.message ||
+                "Backend unreachable"
         };
     }
 }
 
+
+// =====================================================
+// BACKEND CONNECTION CHECK
+// =====================================================
+
 async function pingBackendApi(customBaseUrl = null) {
     const settings = getSettings();
-    const baseUrl = ((customBaseUrl ?? settings.apiBaseUrl) || DEFAULT_SETTINGS.apiBaseUrl).replace(/\/+$/, "");
+
+    const baseUrl = (
+        (customBaseUrl ?? settings.apiBaseUrl) ||
+        DEFAULT_SETTINGS.apiBaseUrl
+    ).replace(/\/+$/, "");
+
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), settings.apiTimeoutMs || 5000);
+
+    const timeoutId = setTimeout(
+        () => controller.abort(),
+        settings.apiTimeoutMs || 5000
+    );
 
     try {
-        const response = await fetch(`${baseUrl}/dashboard`, {
-            method: "GET",
-            headers: { Accept: "application/json" },
-            signal: controller.signal
-        });
+        const response = await fetch(
+            `${baseUrl}/dashboard`,
+            {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                },
+                signal: controller.signal
+            }
+        );
+
         clearTimeout(timeoutId);
+
         return {
             ok: response.ok,
             status: response.status,
             url: `${baseUrl}/dashboard`
         };
+
     } catch (error) {
         clearTimeout(timeoutId);
+
         return {
             ok: false,
             status: null,
@@ -329,41 +541,91 @@ async function pingBackendApi(customBaseUrl = null) {
     }
 }
 
-// --- CITATION & UI HELPERS ---
+
+// =====================================================
+// CITATION HELPER
+// =====================================================
+
 function formatCitation(article, style = "APA") {
     const year = (article.date || "2026").slice(0, 4);
-    const authors = article.authors || "Unknown Author";
-    const venue = article.venue || article.sourceType || "Curated Source";
+
+    const authors = article.authors ||
+        "Unknown Author";
+
+    const venue = article.venue ||
+        article.sourceType ||
+        "Curated Source";
 
     if (style === "IEEE") {
         return `${authors}, "${article.title}," ${venue}, ${year}. [Online]. Available: ${article.url}`;
     }
+
     if (style === "BibTeX") {
-        const key = (article.id || "ref").replace(/[^a-zA-Z0-9_]/g, "_");
+        const key = (article.id || "ref")
+            .replace(/[^a-zA-Z0-9_]/g, "_");
+
         return `@article{${key}, title={${article.title}}, author={${authors}}, journal={${venue}}, year={${year}}, url={${article.url}}}`;
     }
+
     return `${authors} (${year}). ${article.title}. ${venue}. ${article.url}`;
 }
 
+
+// =====================================================
+// TOAST NOTIFICATION
+// =====================================================
+
 function triggerToast(message, isError = false) {
     const toastEl = document.getElementById("actionToast");
+
     const msgEl = document.getElementById("toastMessage");
-    if (!toastEl || !msgEl) return;
+
+    if (!toastEl || !msgEl) {
+        return;
+    }
 
     const iconClass = isError
         ? "bi-exclamation-triangle-fill text-warning"
         : "bi-check-circle-fill text-success";
 
-    msgEl.innerHTML = `<i class="bi ${iconClass}"></i><span>${message}</span>`;
-    bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 }).show();
+    msgEl.innerHTML = `
+        <i class="bi ${iconClass}"></i>
+        <span>${message}</span>
+    `;
+
+    bootstrap.Toast.getOrCreateInstance(
+        toastEl,
+        { delay: 2500 }
+    ).show();
 }
+
+
+// =====================================================
+// APPLY USER THEME
+// =====================================================
 
 function applyUserTheme(themeOverride = null) {
     const settings = getSettings();
-    const theme = themeOverride || settings.uiTheme || "dark";
-    document.documentElement.setAttribute("data-bs-theme", theme);
-    document.body.classList.toggle("density-compact", settings.cardDensity === "compact");
+
+    const theme = themeOverride ||
+        settings.uiTheme ||
+        "dark";
+
+    document.documentElement.setAttribute(
+        "data-bs-theme",
+        theme
+    );
+
+    document.body.classList.toggle(
+        "density-compact",
+        settings.cardDensity === "compact"
+    );
 }
+
+
+// =====================================================
+// INITIALIZATION
+// =====================================================
 
 document.addEventListener("DOMContentLoaded", () => {
     applyUserTheme();
