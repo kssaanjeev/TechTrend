@@ -314,3 +314,58 @@ main > .d-flex:first-child .badge {
     color: var(--bs-primary);
     font-size: 1.7rem;
 }
+
+/* SETTINGS CARDS */
+.settings-main .dashboard-card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.settings-main .dashboard-card:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-2px);
+}
+
+.settings-main .dashboard-card .card-header {
+    min-height: 58px;
+    border-bottom: 1px solid var(--bs-border-color);
+    font-size: 0.95rem;
+}
+
+.settings-main .dashboard-card .card-header i {
+    font-size: 1.1rem;
+}
+
+.settings-main .dashboard-card .card-body {
+    padding: 1.5rem;
+}
+
+.settings-main .form-label {
+    color: var(--bs-body-color);
+}
+
+.settings-main .form-select {
+    min-height: 40px;
+    border-radius: 9px;
+}
+
+.settings-main .form-check {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.settings-main .btn-group .btn {
+    padding: 9px 8px;
+}
+
+@media (max-width: 576px) {
+    .settings-main .dashboard-card .card-body {
+        padding: 1rem;
+    }
+
+    .settings-main .btn-group .btn {
+        font-size: 0.75rem;
+    }
+}
