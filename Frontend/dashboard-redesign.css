@@ -280,3 +280,37 @@ main > .d-flex:first-child .badge {
     white-space: nowrap;
     padding-top: 2px;
 }
+
+/* SETTINGS PAGE HEADER */
+.settings-page-header {
+    padding: 1.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(13, 110, 253, 0.12),
+        rgba(111, 66, 193, 0.08)
+    );
+}
+
+.settings-page-header h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    letter-spacing: -0.5px;
+}
+
+.settings-page-header p {
+    max-width: 620px;
+    line-height: 1.6;
+}
+
+.settings-header-icon {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: rgba(13, 110, 253, 0.15);
+    color: var(--bs-primary);
+    font-size: 1.7rem;
+}
