@@ -377,7 +377,9 @@ function renderBarChart(filtered) {
                     grid: { color: "rgba(38, 48, 68, 0.5)" }
                 },
                 y: {
-                    ticks: { color: "#e6edf3" },
+                    ticks: { color: document.documentElement.getAttribute("data-bs-theme") === "light"
+                                ? "#493d5e"
+                                : "#e6edf3" },
                     grid: { display: false }
                 }
             }
