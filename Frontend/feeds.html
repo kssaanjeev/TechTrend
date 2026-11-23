@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sources &amp; API Feeds | Emerging Technology Trend Identifier</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard-redesign.css">
+</head>
+<body>
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg border-bottom sticky-top top-navbar px-3 px-lg-4">
+        <div class="container-fluid d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <!-- Brand & Academic Badge -->
+            <div class="d-flex align-items-center gap-3">
+                <a class="navbar-brand fw-bold d-flex align-items-center gap-2 mb-0" href="index.html">
+                    <span class="brand-icon"><i class="bi bi-cpu-fill"></i></span>
+                    <span>Emerging Technology Trend Identifier</span>
+                </a>
+                <span class="badge academic-badge d-none d-md-inline-flex align-items-center gap-1">
+                    <i class="bi bi-mortarboard-fill"></i> Students &amp; Faculty • Open Source
+                </span>
+            </div>
+
+            <!-- Feed Search Input -->
+            <div class="search-wrapper flex-grow-1 flex-md-grow-0">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-dark border-secondary-subtle text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        id="feedSearchInput"
+                        class="form-control bg-dark border-secondary-subtle"
+                        placeholder="Search feeds, endpoints, or source types..."
+                        aria-label="Search data sources and feeds"
+                    >
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN SHELL -->
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- LEFT SIDEBAR -->
+            <aside class="col-lg-3 col-xl-2 border-end p-3 p-lg-4 sidebar-panel">
+                <div class="mb-4">
+                    <div class="sidebar-section-title">Workspace</div>
+                    <ul class="nav nav-pills flex-column gap-1" id="sidebarNav">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2" href="index.html">
+                                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active d-flex align-items-center gap-2" href="feeds.html">
+                                <i class="bi bi-rss-fill"></i> Data Sources / Feeds
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center justify-content-between" href="saved.html">
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-bookmark-star-fill"></i> Saved Reading List
+                                </span>
+                                <span class="badge rounded-pill bg-primary-subtle text-primary" id="navSavedBadge">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-2" href="settings.html">
+                                <i class="bi bi-gear-fill"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr class="border-secondary-subtle">
+
+                <!-- Feed Filters -->
+                <div class="sidebar-section-title">Feed Controls</div>
+
+                <div class="mb-3">
+                    <label for="feedTypeFilter" class="form-label small fw-semibold text-light-emphasis">
+                        <i class="bi bi-funnel me-1 text-primary"></i> Source Type
+                    </label>
+                    <select id="feedTypeFilter" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                        <option value="All">All Source Types</option>
+                        <option value="Research Paper">Research Papers</option>
+                        <option value="Tech News">Tech News</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="feedStatusFilter" class="form-label small fw-semibold text-light-emphasis">
+                        <i class="bi bi-activity me-1 text-success"></i> Feed Status
+                    </label>
+                    <select id="feedStatusFilter" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                        <option value="All">All Statuses</option>
+                        <option value="Active">Active Only</option>
+                        <option value="Paused">Paused Only</option>
+                    </select>
+                </div>
+
+                <button id="resetFeedsFilterBtn" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Feed Filters
+                </button>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="col-lg-9 col-xl-10 p-3 p-lg-4">
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                    <div>
+                        <h2 class="fw-bold mb-1 fs-4">Data Sources &amp; API Feeds</h2>
+                        <p class="text-secondary small mb-0">
+                            Configure curated article collections, research APIs, and news feeds powering trend analysis.
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="badge bg-dark border border-secondary-subtle text-secondary py-2 px-3">
+                            <i class="bi bi-check2-circle text-success me-1"></i> Active Feeds: <strong id="activeFeedsCount">0</strong>
+                        </span>
+                        <button id="syncAllBtn" class="btn btn-primary btn-sm">
+                            <i class="bi bi-arrow-repeat me-1"></i> Sync All Active Feeds
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feed Cards Grid -->
+                <div class="row g-3 mb-4" id="feedsGrid">
+                    <!-- Rendered dynamically via js/feeds.js -->
+                </div>
+
+                <!-- Add Custom Feed / Curated Source Card -->
+                <div class="card dashboard-card">
+                    <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
+                        <i class="bi bi-plus-circle-fill text-primary"></i>
+                        <span class="fw-semibold">Add Custom Research or News API Feed</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="addFeedForm" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="feedName" class="form-label small fw-semibold">Source Name</label>
+                                <input
+                                    type="text"
+                                    id="feedName"
+                                    class="form-control form-control-sm bg-dark border-secondary-subtle"
+                                    placeholder="e.g., Semantic Scholar CS"
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-3">
+                                <label for="feedType" class="form-label small fw-semibold">Source Type</label>
+                                <select id="feedType" class="form-select form-select-sm bg-dark border-secondary-subtle">
+                                    <option value="Research Paper">Research Paper</option>
+                                    <option value="Tech News">Tech News</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="feedUrl" class="form-label small fw-semibold">API / Feed Endpoint URL</label>
+                                <div class="input-group input-group-sm">
+                                    <input
+                                        type="url"
+                                        id="feedUrl"
+                                        class="form-control bg-dark border-secondary-subtle"
+                                        placeholder="https://api.example.com/v1/articles"
+                                        required
+                                    >
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-plus-lg me-1"></i>Add Source
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="actionToast" class="toast align-items-center text-bg-dark border-primary" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    <span>Action completed.</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Shared State & Feed Logic -->
+    <script src="js/shared.js"></script>
+    <script src="js/feeds.js"></script>
+</body>
+</html>
