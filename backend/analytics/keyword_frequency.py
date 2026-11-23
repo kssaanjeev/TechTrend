@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 import calendar
 from backend.ingestion.feed_manager import get_processed_articles
-from keyword_analysis import extract_keywords_from_articles
+from .keyword_analysis import extract_keywords_from_articles
 def subtract_months(current_date, months):
     month = current_date.month - months
     year = current_date.year

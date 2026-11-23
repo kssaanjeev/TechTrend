@@ -1,6 +1,6 @@
 from datetime import date
 from backend.ingestion.feed_manager import get_processed_articles
-from keyword_analysis import extract_keywords_from_articles
+from .keyword_analysis import extract_keywords_from_articles
 def generate_month_range(start_date, end_date):
     months = []
     year = start_date.year

@@ -1,6 +1,6 @@
 from datetime import datetime
-from collector import load_and_clean_articles
-from categorizer import categorize_articles
+from .collector import load_and_clean_articles
+from .categorizer import categorize_articles
 
 
 def get_processed_articles():

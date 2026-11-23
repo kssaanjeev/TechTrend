@@ -1,4 +1,4 @@
-from collector import load_and_clean_articles
+from .collector import load_and_clean_articles
 
 # Keywords used to detect each technology category
 CATEGORY_RULES = {
