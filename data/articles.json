@@ -1,0 +1,22 @@
+[
+  {
+    "id": "101",
+    "title": "New AI Model Predicts Protein Folding in Seconds",
+    "authors": "A. Sharma, K. Rao",
+    "venue": "arXiv",
+    "sourceType": "Research",
+    "date": "2026-11-15",
+    "url": "https://arxiv.org/abs/example1",
+    "text": "A deep learning neural network accelerates biological protein structure discovery."
+  },
+  {
+    "id": "102",
+    "title": "Quantum Encryption Protects Banking Networks",
+    "authors": "M. Verma",
+    "venue": "MIT Tech Review",
+    "sourceType": "News",
+    "date": "2026-11-18",
+    "url": "https://technologyreview.com/example2",
+    "text": "Researchers tested quantum key distribution to stop cyber hackers."
+  }
+]
