@@ -20,7 +20,7 @@ def load_local_articles(file_path=DEFAULT_DATA_PATH):
             "venue": item.get("venue", "General"),
             "sourceType": ("Tech News" 
                            if item.get("sourceType", "News") in ["News", "Tech News"]
-                           else "Research"
+                           else "Research Paper"
                         ),
             "date": item.get("date", "2026-01-01"),
             "url": item.get("url", ""),
@@ -55,7 +55,7 @@ def fetch_arxiv_articles(query="artificial+intelligence", max_results=5):
             "title": title,
             "authors": ", ".join(authors_list),
             "venue": "arXiv",
-            "sourceType": "Research",
+            "sourceType": "Research Paper",
             "date": published,
             "url": link,
             "text": summary,
