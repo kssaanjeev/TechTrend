@@ -18,7 +18,10 @@ def load_local_articles(file_path=DEFAULT_DATA_PATH):
             "title": item.get("title", "No Title"),
             "authors": item.get("authors", "Unknown"),
             "venue": item.get("venue", "General"),
-            "sourceType": item.get("sourceType", "News"),
+            "sourceType": ("Tech News" 
+                           if item.get("sourceType", "News") in ["News", "Tech News"]
+                           else "Research"
+                        ),
             "date": item.get("date", "2026-01-01"),
             "url": item.get("url", ""),
             "text": item.get("text", ""),
