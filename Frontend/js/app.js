@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     dashboardState.trendSeries = payload.data.trendSeries;
     dashboardState.sourceMode = payload.sourceMode;
 
+    renderKeywordCheckboxes();
+
     updateDatasetBadge(payload.sourceMode, payload.fallbackReason);
     bindDashboardEvents();
     renderLineChart();
@@ -99,15 +101,10 @@ function bindDashboardEvents() {
         if (searchEl) searchEl.value = "";
         if (srcAllEl) srcAllEl.checked = true;
 
-        const kwAgentic = document.getElementById("kwAgentic");
-        const kwQuantum = document.getElementById("kwQuantum");
-        const kwEdge = document.getElementById("kwEdge");
-        const kwCrypto = document.getElementById("kwCrypto");
-
-        if (kwAgentic) kwAgentic.checked = true;
-        if (kwQuantum) kwQuantum.checked = true;
-        if (kwEdge) kwEdge.checked = true;
-        if (kwCrypto) kwCrypto.checked = false;
+        // Select all dynamically generated keywords
+        document.querySelectorAll(".kw-toggle").forEach(checkbox => {
+        checkbox.checked = true;
+        });
 
         renderLineChart();
         refreshDashboard();
@@ -276,6 +273,56 @@ function updateDashboardKPIs(filtered) {
     updateNavSavedBadge();
 }
 
+
+// --- GENERATE KEYWORD CHECKBOXES FROM BACKEND DATA ---
+function renderKeywordCheckboxes() {
+    const container = document.getElementById("keywordCheckboxes");
+    const keywords = dashboardState.trendSeries?.keywords;
+
+    if (!container || !keywords) return;
+
+    const keywordNames = Object.keys(keywords);
+    const colors = [
+        "#58a6ff",
+        "#a371f7",
+        "#3fb950",
+        "#f78166",
+        "#39c5cf",
+        "#d29922",
+        "#db61a2"
+    ];
+
+    container.innerHTML = "";
+
+    keywordNames.forEach((keyword, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "form-check";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "form-check-input kw-toggle";
+        checkbox.value = keyword;
+        checkbox.id = `kwDynamic${index}`;
+        checkbox.checked = index < 4;
+        checkbox.dataset.color = colors[index % colors.length];
+
+        const label = document.createElement("label");
+        label.className = "form-check-label small";
+        label.htmlFor = checkbox.id;
+
+        const dot = document.createElement("span");
+        dot.className = "legend-dot";
+        dot.style.backgroundColor = colors[index % colors.length];
+
+        label.appendChild(dot);
+        label.appendChild(document.createTextNode(keyword));
+
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(label);
+        container.appendChild(wrapper);
+    });
+}
+
 // --- MULTI-LINE TREND COMPARISON CHART ---
 function renderLineChart() {
     const canvas = document.getElementById("trendLineChart");
@@ -286,11 +333,14 @@ function renderLineChart() {
         .filter(kw => Boolean(dashboardState.trendSeries.keywords?.[kw]))
         .map(kw => {
             const series = dashboardState.trendSeries.keywords[kw];
+            const color = document.querySelector(
+            `.kw-toggle[value="${CSS.escape(kw)}"]`
+            )?.dataset.color || "#58a6ff";
             return {
                 label: kw,
                 data: series.data,
-                borderColor: series.color,
-                backgroundColor: `${series.color}22`,
+                borderColor: color,
+                backgroundColor: `${color}22`,
                 borderWidth: 2.5,
                 tension: 0.35,
                 pointRadius: 4,
@@ -314,7 +364,17 @@ function renderLineChart() {
             plugins: {
                 legend: {
                     position: "bottom",
-                    labels: { color: "#e6edf3", usePointStyle: true, padding: 16 }
+                    labels: {
+                    color: document.documentElement.getAttribute("data-bs-theme") === "light"
+                    ? "#303044"
+                    : "#ffffff",
+                    usePointStyle: true,
+                    padding: 16,
+                    font: {
+                    size: 12,
+                    weight: "500"
+                    }
+                }
                 }
             },
             scales: {

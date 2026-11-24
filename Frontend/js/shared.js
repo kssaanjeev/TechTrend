@@ -43,7 +43,7 @@ function getUserStorageKey(baseKey) {
 const DEFAULT_SETTINGS = {
     apiBaseUrl: "http://127.0.0.1:8000/api",
     apiTimeoutMs: 5000,
-    useLiveApi: false,
+    useLiveApi: true,
     defaultCategory: "All",
     defaultTimePeriod: "all",
     defaultSourceType: "All",
@@ -427,14 +427,6 @@ async function fetchDashboardPayload() {
         DEFAULT_SETTINGS.apiBaseUrl
     ).replace(/\/+$/, "");
 
-    // Use curated fallback when live API is disabled.
-    if (!settings.useLiveApi) {
-        return {
-            data: CURATED_DATA,
-            sourceMode: "curated",
-            fallbackReason: null
-        };
-    }
 
     const controller = new AbortController();
 
