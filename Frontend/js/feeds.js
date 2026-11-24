@@ -233,9 +233,7 @@ function renderFeeds() {
     const activeCountEl = document.getElementById("activeFeedsCount");
 
     if (activeCountEl) {
-        activeCountEl.textContent = feedsState.filter(
-            feed => feed.active && feed.status !== "Failed"
-        ).length;
+        feedsState.filter(feed => feed.active).length;
     }
 
     if (!grid) return;
