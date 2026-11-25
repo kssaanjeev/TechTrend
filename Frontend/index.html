@@ -114,14 +114,29 @@
                     </select>
                 </div>
 
-                <!-- Compare Keywords Checkboxes -->
-                <div class="mb-4">
-                    <label class="form-label small fw-semibold text-light-emphasis">
-                        <i class="bi bi-graph-up me-1 text-success"></i> Compare Keywords
-                    </label>
-                    <div id="keywordCheckboxes" class="d-flex flex-column gap-2 ps-1">
-                    </div>
+                
+            <!-- Compare Keywords Checkboxes -->
+            <div class="mb-4">
+                <label class="form-label small fw-semibold text-light-emphasis">
+                    <i class="bi bi-graph-up me-1 text-success"></i> Compare Keywords
+                </label>
+
+                <div class="d-flex gap-2 mb-2">
+                    <button type="button" id="selectAllKeywords"
+                        class="btn btn-sm btn-outline-success">
+                        Select All
+                    </button>
+
+                    <button type="button" id="deselectAllKeywords"
+                        class="btn btn-sm btn-outline-secondary">
+                        Deselect All
+                    </button>
                 </div>
+
+                <div id="keywordCheckboxes" class="d-flex flex-column gap-2 ps-1">
+                </div>
+            </div>
+
 
                 <!-- Reset Filters Button -->
                 <button id="resetFiltersBtn" class="btn btn-outline-secondary btn-sm w-100">

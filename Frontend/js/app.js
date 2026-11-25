@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     dashboardState.sourceMode = payload.sourceMode;
 
     renderKeywordCheckboxes();
+    bindKeywordSelectionButtons();
 
     updateDatasetBadge(payload.sourceMode, payload.fallbackReason);
     bindDashboardEvents();
@@ -86,7 +87,7 @@ function bindDashboardEvents() {
 
     // Keyword comparison checkboxes (multi-line chart)
     document.querySelectorAll(".kw-toggle").forEach(cb => {
-        cb.addEventListener("change", renderLineChart);
+        cb.addEventListener("change", () => renderLineChart());
     });
 
     // Reset filters button
@@ -143,7 +144,9 @@ function getFilteredArticles() {
 
 function refreshDashboard() {
     const filtered = getFilteredArticles();
+
     updateDashboardKPIs(filtered);
+    renderLineChart(filtered);
     renderBarChart(filtered);
     renderTrendingTopics(filtered);
     renderArticleFeed(filtered);
@@ -323,22 +326,94 @@ function renderKeywordCheckboxes() {
     });
 }
 
+
+function bindKeywordSelectionButtons() {
+    const selectAllButton = document.getElementById("selectAllKeywords");
+    const deselectAllButton = document.getElementById("deselectAllKeywords");
+
+    if (!selectAllButton || !deselectAllButton) return;
+
+    selectAllButton.addEventListener("click", () => {
+        document.querySelectorAll(".kw-toggle").forEach(checkbox => {
+            checkbox.checked = true;
+            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    });
+
+    deselectAllButton.addEventListener("click", () => {
+        document.querySelectorAll(".kw-toggle").forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    });
+}
+
+
+
 // --- MULTI-LINE TREND COMPARISON CHART ---
-function renderLineChart() {
+function renderLineChart(filteredArticles = getFilteredArticles()) {
     const canvas = document.getElementById("trendLineChart");
     if (!canvas || !dashboardState.trendSeries) return;
 
-    const selectedKeywords = Array.from(document.querySelectorAll(".kw-toggle:checked")).map(cb => cb.value);
+    const selectedKeywords = Array.from(
+        document.querySelectorAll(".kw-toggle:checked")
+    ).map(cb => cb.value);
+
+    const days = document.getElementById("timeFilter")?.value || "all";
+
+    // Keep monthly labels for All Time.
+    // Use daily labels for shorter time periods.
+    let labels;
+
+    if (days === "all") {
+        labels = dashboardState.trendSeries.labels || [];
+    } else {
+        const numberOfDays = parseInt(days, 10);
+
+        labels = [];
+
+        for (let i = numberOfDays - 1; i >= 0; i--) {
+            const date = new Date(REFERENCE_DATE);
+            date.setDate(date.getDate() - i);
+
+            labels.push(
+                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+            );
+        }
+    }
+
+    // Calculate keyword mentions using the currently filtered articles.
     const datasets = selectedKeywords
-        .filter(kw => Boolean(dashboardState.trendSeries.keywords?.[kw]))
-        .map(kw => {
-            const series = dashboardState.trendSeries.keywords[kw];
-            const color = document.querySelector(
-            `.kw-toggle[value="${CSS.escape(kw)}"]`
-            )?.dataset.color || "#58a6ff";
+        .map(keyword => {
+            const checkbox = document.querySelector(
+                `.kw-toggle[value="${CSS.escape(keyword)}"]`
+            );
+
+            const color = checkbox?.dataset.color || "#58a6ff";
+
+            const counts = {};
+
+            labels.forEach(label => {
+                counts[label] = 0;
+            });
+
+            filteredArticles.forEach(article => {
+                const articleDate = article.date || "";
+                const bucket = days === "all"
+                    ? articleDate.substring(0, 7)
+                    : articleDate.substring(0, 10);
+
+                if (
+                    Object.prototype.hasOwnProperty.call(counts, bucket) &&
+                    (article.keywords || []).includes(keyword)
+                ) {
+                    counts[bucket]++;
+                }
+            });
+
             return {
-                label: kw,
-                data: series.data,
+                label: keyword,
+                data: labels.map(label => counts[label]),
                 borderColor: color,
                 backgroundColor: `${color}22`,
                 borderWidth: 2.5,
@@ -349,32 +424,38 @@ function renderLineChart() {
         });
 
     const ctx = canvas.getContext("2d");
-    if (lineChartInstance) lineChartInstance.destroy();
+
+    if (lineChartInstance) {
+        lineChartInstance.destroy();
+    }
 
     lineChartInstance = new Chart(ctx, {
         type: "line",
         data: {
-            labels: dashboardState.trendSeries.labels,
+            labels,
             datasets
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: { mode: "index", intersect: false },
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
             plugins: {
                 legend: {
                     position: "bottom",
                     labels: {
-                    color: document.documentElement.getAttribute("data-bs-theme") === "light"
-                    ? "#303044"
-                    : "#ffffff",
-                    usePointStyle: true,
-                    padding: 16,
-                    font: {
-                    size: 12,
-                    weight: "500"
+                        color: document.documentElement.getAttribute("data-bs-theme") === "light"
+                            ? "#303044"
+                            : "#ffffff",
+                        usePointStyle: true,
+                        padding: 16,
+                        font: {
+                            size: 12,
+                            weight: "500"
+                        }
                     }
-                }
                 }
             },
             scales: {
@@ -391,6 +472,7 @@ function renderLineChart() {
         }
     });
 }
+
 
 // --- KEYWORD FREQUENCY BAR CHART ---
 function renderBarChart(filtered) {

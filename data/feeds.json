@@ -1,0 +1,62 @@
+[
+    {
+        "id": "d2936daa3598d5d2",
+        "name": "ACM TechNews",
+        "type": "Tech News",
+        "endpoint": "https://rss.acm.org/technews/TechNews.xml",
+        "active": true,
+        "interval": "Manual",
+        "lastSync": "2026-11-25T10:52:18.556478+00:00",
+        "count": 12,
+        "status": "Active",
+        "lastError": null
+    },
+    {
+        "id": "d560525841c01b76",
+        "name": "The Hacker News",
+        "type": "Tech News",
+        "endpoint": "https://thehackernews.com/feeds/posts/default",
+        "active": true,
+        "interval": "Manual",
+        "lastSync": "2026-11-25T10:52:22.641054+00:00",
+        "count": 50,
+        "status": "Active",
+        "lastError": null
+    },
+    {
+        "id": "c1bc4b36ab2bb718",
+        "name": "arXiv Quantum Computing",
+        "type": "Research Paper",
+        "endpoint": "https://export.arxiv.org/api/query?search_query=all:quantum%20computing&start=0&max_results=10",
+        "active": true,
+        "interval": "Manual",
+        "lastSync": "2026-11-25T10:52:23.060339+00:00",
+        "count": 10,
+        "status": "Active",
+        "lastError": null
+    },
+    {
+        "id": "8fb86334c28d493c",
+        "name": "BBC Technology News",
+        "type": "Research Paper",
+        "endpoint": "https://feeds.bbci.co.uk/news/technology/rss.xml",
+        "active": true,
+        "interval": "Manual",
+        "lastSync": "2026-11-25T10:52:23.674967+00:00",
+        "count": 21,
+        "status": "Active",
+        "lastError": null
+    },
+    {
+        "id": "018b95d34d79608f",
+        "name": "Google News Technology",
+        "type": "Tech News",
+        "endpoint": "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en",
+        "active": true,
+        "interval": "Manual",
+        "lastSync": "2026-11-25T10:52:24.575183+00:00",
+        "count": 70,
+        "status": "Active",
+        "lastError": null
+    }
+]
