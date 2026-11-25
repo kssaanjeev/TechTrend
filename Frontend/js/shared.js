@@ -41,7 +41,7 @@ function getUserStorageKey(baseKey) {
 // --- DEFAULT SETTINGS ---
 
 const DEFAULT_SETTINGS = {
-    apiBaseUrl: "http://127.0.0.1:8000/api",
+    apiBaseUrl: "https://techtrend-jjyz.onrender.com/api",
     apiTimeoutMs: 5000,
     useLiveApi: true,
     defaultCategory: "All",
