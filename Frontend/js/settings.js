@@ -386,28 +386,11 @@ function showDemoProfile() {
 // LOGOUT
 // ========================================
 
+
 function logoutDemoUser() {
+    // Remove the active login session.
+    localStorage.removeItem("ett_demo_user");
 
-    // Remove ONLY the active login session.
-    // Never clear saved articles or preferences here.
-    localStorage.removeItem(DEMO_SESSION_KEY);
-
-    const loginButton = document.getElementById("headerLoginBtn");
-    const profileMenu = document.getElementById("headerProfileMenu");
-
-    if (loginButton) {
-        loginButton.hidden = false;
-    }
-
-    if (profileMenu) {
-        profileMenu.hidden = true;
-    }
-
-    // Switch to guest preferences after logout.
-    populateSettingsForm();
-
-    // Display guest saved count.
-    updateNavSavedBadge();
-
-    triggerToast("You have been logged out.");
+    // Return to the login page.
+    window.location.replace("login.html");
 }
