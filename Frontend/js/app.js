@@ -3,7 +3,8 @@
  * Works with js/shared.js and index.html across multi-page navigation[cite: 8, 9].
  */
 
-const REFERENCE_DATE = new Date("2026-11-19T00:00:00");
+const REFERENCE_DATE = new Date();
+REFERENCE_DATE.setHours(0, 0, 0, 0);
 
 let dashboardState = {
     articles: [],
@@ -113,6 +114,48 @@ function bindDashboardEvents() {
     });
 }
 
+function parseArticleDate(value) {
+    if (!value) return null;
+
+    const dateText = String(value).trim();
+
+    // Supports DD.MM.YY and DD.MM.YYYY
+    const formattedMatch = dateText.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2}|\d{4})$/);
+
+    if (formattedMatch) {
+        const day = Number(formattedMatch[1]);
+        const month = Number(formattedMatch[2]);
+        let year = Number(formattedMatch[3]);
+
+        if (year < 100) year += 2000;
+
+        const date = new Date(year, month - 1, day);
+
+        if (
+            date.getFullYear() === year &&
+            date.getMonth() === month - 1 &&
+            date.getDate() === day
+        ) {
+            return date;
+        }
+
+        return null;
+    }
+
+    // Supports YYYY-MM-DD and ISO date strings
+    const isoMatch = dateText.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (isoMatch) {
+        return new Date(
+            Number(isoMatch[1]),
+            Number(isoMatch[2]) - 1,
+            Number(isoMatch[3])
+        );
+    }
+
+    return null;
+}
+
 // --- FILTERING & MASTER REFRESH ---
 function getFilteredArticles() {
     const category = document.getElementById("categoryFilter")?.value || "All";
@@ -125,7 +168,8 @@ function getFilteredArticles() {
         if (sourceType !== "All" && article.sourceType !== sourceType) return false;
 
         if (days !== "all") {
-            const pubDate = new Date((article.date || "2026-11-19") + "T00:00:00");
+            const pubDate = parseArticleDate(article.date);
+            if (!pubDate) return false;
             const diffDays = (REFERENCE_DATE - pubDate) / (1000 * 60 * 60 * 24);
             if (diffDays > parseInt(days, 10)) return false;
         }
@@ -153,6 +197,7 @@ function refreshDashboard() {
 }
 
 // --- TRENDING TECHNOLOGIES ---
+
 function renderTrendingTopics(articles) {
     const container = document.getElementById("trendingTopicsContainer");
     if (!container) return;
@@ -164,6 +209,9 @@ function renderTrendingTopics(articles) {
             counts[keyword] = (counts[keyword] || 0) + 1;
         });
     });
+
+    const totalMentions = Object.values(counts)
+        .reduce((total, count) => total + count, 0);
 
     const topics = Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
@@ -181,6 +229,13 @@ function renderTrendingTopics(articles) {
 
     topics.forEach(([keyword, count], index) => {
         const trend = dashboardState.trendSeries?.keywords?.[keyword];
+
+        const activityPercent = trend?.growth
+            ? trend.growth
+            : `${totalMentions > 0
+                ? Math.round((count / totalMentions) * 100)
+                : 0}%`;
+
         const card = document.createElement("div");
         card.className = "trending-topic-card";
 
@@ -202,19 +257,17 @@ function renderTrendingTopics(articles) {
 
         const label = document.createElement("span");
         label.textContent = "Topic activity";
-        footer.appendChild(label);
 
-        if (trend?.growth) {
-            const growth = document.createElement("span");
-            growth.className = "trending-growth";
-            growth.textContent = trend.growth;
-            footer.appendChild(growth);
-        }
+        const growth = document.createElement("span");
+        growth.className = "trending-growth";
+        growth.textContent = activityPercent;
 
+        footer.append(label, growth);
         card.append(rank, name, mentions, footer);
         container.appendChild(card);
     });
 }
+
 
 // --- UPDATE 4 KPI SUMMARY CARDS ---
 function updateDashboardKPIs(filtered) {
@@ -365,11 +418,20 @@ function renderLineChart(filteredArticles = getFilteredArticles()) {
     // Use daily labels for shorter time periods.
     let labels;
 
+    const validDates = filteredArticles
+    .map(article => parseArticleDate(article.date))
+    .filter(date => date !== null);
+
     if (days === "all") {
-        labels = dashboardState.trendSeries.labels || [];
+        const months = [...new Set(
+            validDates.map(date =>
+                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+            )
+        )].sort();
+
+        labels = months;
     } else {
         const numberOfDays = parseInt(days, 10);
-
         labels = [];
 
         for (let i = numberOfDays - 1; i >= 0; i--) {
@@ -398,10 +460,16 @@ function renderLineChart(filteredArticles = getFilteredArticles()) {
             });
 
             filteredArticles.forEach(article => {
-                const articleDate = article.date || "";
+                const parsedDate = parseArticleDate(article.date);
+                if (!parsedDate) return;
+                const articleDate = [
+                    parsedDate.getFullYear(),
+                    String(parsedDate.getMonth() + 1).padStart(2, "0"),
+                    String(parsedDate.getDate()).padStart(2, "0")
+                ].join("-");
                 const bucket = days === "all"
                     ? articleDate.substring(0, 7)
-                    : articleDate.substring(0, 10);
+                    : articleDate;
 
                 if (
                     Object.prototype.hasOwnProperty.call(counts, bucket) &&
@@ -438,6 +506,9 @@ function renderLineChart(filteredArticles = getFilteredArticles()) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: getSettings().enableChartAnimations ? 1000 : 0
+            },
             interaction: {
                 mode: "index",
                 intersect: false
@@ -509,6 +580,9 @@ function renderBarChart(filtered) {
             indexAxis: "y",
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: getSettings().enableChartAnimations ? 1000 : 0
+            },
             plugins: {
                 legend: { display: false }
             },
@@ -602,9 +676,11 @@ function renderArticleFeed(articles) {
                 </div>
 
                 <h5 class="fw-bold mb-2">${article.title}</h5>
-                <p class="text-secondary small mb-2">
-                    <strong class="text-light-emphasis">Summary:</strong> ${article.summary}
-                </p>
+                ${getSettings().showSummariesByDefault ? `
+                    <p class="text-secondary small mb-2">
+                        <strong class="text-light-emphasis">Summary:</strong> ${article.summary || "No summary available."}
+                    </p>
+                ` : ""}
 
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-1">
                     <div>
@@ -630,7 +706,11 @@ window.handleCopyCitation = function(articleId) {
     const article = dashboardState.articles.find(a => a.id === articleId);
     if (!article) return;
 
-    const citation = formatCitation(article, "APA");
+    const settings = getSettings();
+    const citation = formatCitation(
+        article,
+        settings.defaultCitationStyle || "APA"
+    );
     navigator.clipboard.writeText(citation).then(() => {
         showDashboardToast("Citation copied to clipboard!");
     }).catch(() => {

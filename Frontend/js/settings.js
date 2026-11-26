@@ -77,6 +77,45 @@ function bindSettingsEvents() {
         });
     });
 
+        // Auto-save preferences whenever a setting changes
+    const autoSaveSettings = () => {
+        const current = getSettings();
+
+        const updated = saveSettings({
+            ...current,
+
+            uiTheme:
+                document.querySelector('input[name="uiTheme"]:checked')?.value || "dark",
+
+            cardDensity:
+                document.getElementById("cardDensity")?.value || "comfortable",
+
+            showSummariesByDefault: Boolean(
+                document.getElementById("showSummariesByDefault")?.checked
+            ),
+
+            enableChartAnimations: Boolean(
+                document.getElementById("enableChartAnimations")?.checked
+            ),
+
+            defaultCategory:
+                document.getElementById("defaultCategory")?.value || "All",
+
+            defaultTimePeriod:
+                document.getElementById("defaultTimePeriod")?.value || "all",
+
+            defaultCitationStyle:
+                document.getElementById("defaultCitationStyle")?.value || "APA"
+        });
+
+        applyUserTheme(updated.uiTheme);
+    };
+
+    document.querySelectorAll(
+        '#settingsForm input, #settingsForm select'
+    ).forEach(control => {
+        control.addEventListener("change", autoSaveSettings);
+    });
 
     // Save Preferences
     document.getElementById("settingsForm")?.addEventListener("submit", (e) => {

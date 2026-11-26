@@ -508,3 +508,12 @@ body {
 #kpiTopCategory {
     font-size: clamp(1rem, 1.5vw, 1.5rem);
 }
+
+/* Compact density for dashboard cards */
+.density-compact .dashboard-card .card-body {
+    padding: 1rem !important;
+}
+
+.density-compact .dashboard-card {
+    margin-bottom: 0.5rem;
+}
